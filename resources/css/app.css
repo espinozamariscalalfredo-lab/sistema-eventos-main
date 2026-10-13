@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Modo oscuro global. Los colores de los eventos se conservan. */
+html[data-tema="oscuro"] body { background: #0b1120; color: #e2e8f0; }
+html[data-tema="oscuro"] .min-h-screen,
+html[data-tema="oscuro"] .bg-white,
+html[data-tema="oscuro"] nav.bg-white,
+html[data-tema="oscuro"] header.bg-white,
+html[data-tema="oscuro"] [style*="background: white"],
+html[data-tema="oscuro"] [style*="background: #fff"],
+html[data-tema="oscuro"] [style*="background-color: white"],
+html[data-tema="oscuro"] [style*="background-color: #fff"],
+html[data-tema="oscuro"] [style*="background: rgba(255, 255, 255"],
+html[data-tema="oscuro"] [style*="background: rgba(248, 250, 252"] { background-color: #111827 !important; }
+html[data-tema="oscuro"] .bg-gray-50,
+html[data-tema="oscuro"] .bg-gray-100,
+html[data-tema="oscuro"] .bg-gray-200,
+html[data-tema="oscuro"] [style*="background-color: #f9fafb"],
+html[data-tema="oscuro"] [style*="background: #f9fafb"] { background-color: #1e293b !important; }
+
+/* Algunos controles usan fondo transparente; en oscuro reciben una superficie visible. */
+html[data-tema="oscuro"] .bg-transparent,
+html[data-tema="oscuro"] .tabla-icono-accion,
+html[data-tema="oscuro"] [style*="background: transparent"],
+html[data-tema="oscuro"] [style*="background-color: transparent"] { background-color: #1e293b !important; }
+html[data-tema="oscuro"] #edit-booking-modal { background: transparent !important; }
+html[data-tema="oscuro"] .edit-modal-panel { background: rgba(17, 24, 39, 0.96) !important; border-color: #334155 !important; }
+html[data-tema="oscuro"] .edit-modal-drag-handle { background: rgba(30, 41, 59, 0.96) !important; }
+
+html[data-tema="oscuro"] [style*="color: #475b75"],
+html[data-tema="oscuro"] [style*="color: #374151"],
+html[data-tema="oscuro"] [style*="color: #4b5563"],
+html[data-tema="oscuro"] [style*="color: #334155"],
+html[data-tema="oscuro"] [style*="color: #64748b"],
+html[data-tema="oscuro"] [style*="color: #6b7280"],
+html[data-tema="oscuro"] [style*="color: #9ca3af"],
+html[data-tema="oscuro"] [style*="color: #94a3b8"],
+html[data-tema="oscuro"] [style*="color: #000"],
+html[data-tema="oscuro"] [style*="color: black"],
+html[data-tema="oscuro"] .text-gray-900,
+html[data-tema="oscuro"] .text-gray-800,
+html[data-tema="oscuro"] .text-gray-700,
+html[data-tema="oscuro"] .text-gray-600,
+html[data-tema="oscuro"] .text-gray-500,
+html[data-tema="oscuro"] .text-gray-400,
+html[data-tema="oscuro"] .text-slate-700,
+html[data-tema="oscuro"] .text-slate-600,
+html[data-tema="oscuro"] .text-slate-500 { color: #cbd5e1 !important; }
+html[data-tema="oscuro"] [style*="color: #2563eb"],
+html[data-tema="oscuro"] [style*="color: #3b82f6"],
+html[data-tema="oscuro"] .text-blue-500,
+html[data-tema="oscuro"] .text-blue-600,
+html[data-tema="oscuro"] .text-indigo-600,
+html[data-tema="oscuro"] .text-indigo-700 { color: #93c5fd !important; }
+html[data-tema="oscuro"] [style*="color: #ef4444"],
+html[data-tema="oscuro"] .text-red-500,
+html[data-tema="oscuro"] .text-red-600 { color: #fca5a5 !important; }
+
+html[data-tema="oscuro"] .border-gray-100,
+html[data-tema="oscuro"] .border-gray-200,
+html[data-tema="oscuro"] .border-gray-300,
+html[data-tema="oscuro"] [style*="border: 1px solid #e5e7eb"],
+html[data-tema="oscuro"] [style*="border: 1px solid #cbd5e1"],
+html[data-tema="oscuro"] [style*="border: 1px solid #d1d5db"],
+html[data-tema="oscuro"] [style*="border-bottom: 1px solid #e5e7eb"],
+html[data-tema="oscuro"] [style*="border-top: 1px solid #e5e7eb"] { border-color: #334155 !important; }
+html[data-tema="oscuro"] input,
+html[data-tema="oscuro"] textarea,
+html[data-tema="oscuro"] select { background-color: #0f172a !important; color: #e2e8f0 !important; border-color: #475569 !important; }
+html[data-tema="oscuro"] input::placeholder,
+html[data-tema="oscuro"] textarea::placeholder { color: #94a3b8 !important; }
+html[data-tema="oscuro"] .fc-theme-standard th,
+html[data-tema="oscuro"] .fc-theme-standard td { border-color: #334155; }
+html[data-tema="oscuro"] .fc,
+html[data-tema="oscuro"] .fc .fc-daygrid-day-number,
+html[data-tema="oscuro"] .fc .fc-col-header-cell-cushion { color: #e2e8f0; }
+html[data-tema="oscuro"] .fc .fc-day-today { background-color: #172554 !important; }
+html[data-tema="oscuro"] .mini-cal td:not(.mc-has-event) { background-color: #111827; color: #cbd5e1; }
+html[data-tema="oscuro"] .mini-cal th,
+html[data-tema="oscuro"] .fc-timegrid-slot-label-cushion { color: #94a3b8; }
+html[data-tema="oscuro"] tr:hover { background-color: #1e293b !important; }
