@@ -19,7 +19,7 @@
             <section style="border: 1px solid #cbd5e1; border-radius: 11px; padding: 16px; background: #fff; margin-bottom: 20px;">
                 <h2 style="font-size: 19px; font-weight: bold; color: #475b75; margin-bottom: 6px;">Nombres de eventos del calendario</h2>
                 <p style="font-size: 13px; color: #64748b; margin-bottom: 14px;">Consulta los nombres y su estado. El color no se puede cambiar y no se permite repetirlo.</p>
-                @if(auth()->user()->rol === 'superadmin')
+                @if(in_array(auth()->user()->rol, ['admin', 'superadmin'], true))
                 @if(session('estado_catalogo'))
                     <p role="status" style="padding: 9px 12px; margin-bottom: 12px; color: #166534; background: #f0fdf4; border-radius: 6px;">{{ session('estado_catalogo') }}</p>
                 @endif
@@ -41,19 +41,19 @@
                     <label style="font-size: 12px; color: #475569;">Orden
                         <input type="number" name="orden" min="0" max="9999" value="0" style="display:block; width:82px; border:1px solid #cbd5e1; border-radius:6px; padding:7px;">
                     </label>
-                    <button type="submit" style="background:#2563eb; color:white; border:0; padding:8px 13px; border-radius:6px; cursor:pointer;">Agregar nombre</button>
+                    <button type="submit" style="background:#2563eb; color:white; border:0; padding:8px 13px; border-radius:6px; cursor:pointer;">Agregar Salon</button>
                 </form>
                 @endif
 
                 <div style="overflow-x:auto;">
                     <table style="width:100%; border-collapse:collapse; font-size:13px; text-align:left;">
                         <thead><tr style="background:#f1f5f9; color:#475b75;">
-                            <th style="padding:9px;">Nombre</th><th style="padding:9px;">Color</th><th style="padding:9px;">Orden</th><th style="padding:9px;">Estado</th>@if(auth()->user()->rol === 'superadmin')<th style="padding:9px;">Guardar</th><th style="padding:9px;">Acciones</th>@endif
+                            <th style="padding:9px;">Nombre</th><th style="padding:9px;">Color</th><th style="padding:9px;">Orden</th><th style="padding:9px;">Estado</th>@if(in_array(auth()->user()->rol, ['admin', 'superadmin'], true))<th style="padding:9px;">Guardar</th><th style="padding:9px;">Acciones</th>@endif
                         </tr></thead>
                         <tbody>
                         @foreach($salones as $salon)
                             <tr style="border-top:1px solid #e2e8f0;">
-                                @if(auth()->user()->rol === 'superadmin')
+                                @if(in_array(auth()->user()->rol, ['admin', 'superadmin'], true))
                                 <td style="padding:8px;"><form id="editar-salon-{{ $salon->id }}" action="{{ route('salones.nombres.update', $salon) }}" method="POST">
                                         @csrf @method('PUT')
                                         <input name="nombre" value="{{ $salon->nombre }}" maxlength="120" required aria-label="Nombre" style="width:100%; min-width:180px; border:1px solid #cbd5e1; border-radius:6px; padding:7px;">

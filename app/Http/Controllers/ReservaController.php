@@ -247,9 +247,10 @@ class ReservaController extends Controller
     {
         $reservas = Reserva::orderBy('fecha_creacion', 'desc')->paginate(10);
         $totalFormularios = Reserva::count();
-        $ultimaReserva = Reserva::orderBy('fecha_creacion', 'desc')->first();
+        // Cambiar el nombre aquí y en el compact:
+        $ultimoEvento = Reserva::orderBy('fecha_creacion', 'desc')->first();
 
-        return view('salones.supervisar_reservas', compact('reservas', 'totalFormularios', 'ultimaReserva'));
+        return view('salones.supervisar_reservas', compact('reservas', 'totalFormularios', 'ultimoEvento'));
     }
     // Abre el formulario completo de creación.
     public function mostrarFormularioCrear()
