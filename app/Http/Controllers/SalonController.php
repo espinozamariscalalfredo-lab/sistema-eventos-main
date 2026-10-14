@@ -38,6 +38,23 @@ class SalonController extends Controller
         return back()->with('estado_catalogo', 'Nombre agregado al calendario.');
     }
 
+    public function destroy($id)
+    {
+        // 1. Encontramos y eliminamos el salón
+        $salon = Salon::findOrFail($id);
+        $salon->delete();
+
+        // 2. Obtenemos todos los salones restantes, ordenados por su 'orden' actual
+        $salonesRestantes = Salon::orderBy('orden', 'asc')->get();
+
+        // 3. Recalculamos el orden desde 0 en adelante (0, 1, 2, 3...)
+        foreach ($salonesRestantes as $index => $salonRestante) {
+            $salonRestante->orden = $index;
+            $salonRestante->save();
+        }
+
+        return redirect()->back()->with('estado_catalogo', 'Salón eliminado y el orden ha sido recalculado exitosamente.');
+    }
     // Renombra el catálogo y sus reservas en una sola transacción.
     public function actualizarNombre(Request $request, Salon $salon)
     {

@@ -18,8 +18,8 @@
             @if(in_array(auth()->user()->rol, ['admin', 'superadmin'], true))
             <section style="border: 1px solid #cbd5e1; border-radius: 11px; padding: 16px; background: #fff; margin-bottom: 20px;">
                 <h2 style="font-size: 19px; font-weight: bold; color: #475b75; margin-bottom: 6px;">Nombres de eventos del calendario</h2>
-                <p style="font-size: 13px; color: #64748b; margin-bottom: 14px;">Consulta los nombres y su estado. El color no se puede cambiar y no se permite repetirlo.</p>
-                @if(in_array(auth()->user()->rol, ['admin', 'superadmin'], true))
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 14px;">Consulta y administra los salones. Ahora puedes editar el nombre, el color y el orden guardando los cambios.</p>
+                
                 @if(session('estado_catalogo'))
                     <p role="status" style="padding: 9px 12px; margin-bottom: 12px; color: #166534; background: #f0fdf4; border-radius: 6px;">{{ session('estado_catalogo') }}</p>
                 @endif
@@ -43,36 +43,74 @@
                     </label>
                     <button type="submit" style="background:#2563eb; color:white; border:0; padding:8px 13px; border-radius:6px; cursor:pointer;">Agregar Salon</button>
                 </form>
-                @endif
 
                 <div style="overflow-x:auto;">
                     <table style="width:100%; border-collapse:collapse; font-size:13px; text-align:left;">
                         <thead><tr style="background:#f1f5f9; color:#475b75;">
-                            <th style="padding:9px;">Nombre</th><th style="padding:9px;">Color</th><th style="padding:9px;">Orden</th><th style="padding:9px;">Estado</th>@if(in_array(auth()->user()->rol, ['admin', 'superadmin'], true))<th style="padding:9px;">Guardar</th><th style="padding:9px;">Acciones</th>@endif
+                            <th style="padding:9px;">Nombre</th>
+                            <th style="padding:9px;">Color</th>
+                            <th style="padding:9px;">Orden</th>
+                            <th style="padding:9px;">Estado</th>
+                            <th style="padding:9px;">Guardar</th>
+                            <th style="padding:9px;">Acciones</th>
                         </tr></thead>
                         <tbody>
                         @foreach($salones as $salon)
                             <tr style="border-top:1px solid #e2e8f0;">
-                                @if(in_array(auth()->user()->rol, ['admin', 'superadmin'], true))
-                                <td style="padding:8px;"><form id="editar-salon-{{ $salon->id }}" action="{{ route('salones.nombres.update', $salon) }}" method="POST">
+                                {{-- FORMULARIO PRINCIPAL DE EDICIÓN (Abarca Nombre, Color y Orden) --}}
+                                <td style="padding:8px;">
+                                    <form id="editar-salon-{{ $salon->id }}" action="{{ route('salones.nombres.update', $salon) }}" method="POST" style="margin: 0;">
                                         @csrf @method('PUT')
                                         <input name="nombre" value="{{ $salon->nombre }}" maxlength="120" required aria-label="Nombre" style="width:100%; min-width:180px; border:1px solid #cbd5e1; border-radius:6px; padding:7px;">
-                                    </form></td>
-                                <td style="padding:8px;"><span title="{{ $salon->color }}" aria-label="Color {{ $salon->color }}" style="display:inline-block; width:28px; height:24px; vertical-align:middle; border:1px solid #cbd5e1; border-radius:5px; background:{{ $salon->color }};"></span> <small style="color:#64748b;">Fijo</small></td>
-                                <td style="padding:8px;"><input form="editar-salon-{{ $salon->id }}" type="number" name="orden" value="{{ $salon->orden }}" min="0" max="9999" required aria-label="Orden" style="width:74px; border:1px solid #cbd5e1; border-radius:6px; padding:7px;"></td>
-                                <td style="padding:8px; color:{{ $salon->activo ? '#15803d' : '#64748b' }};">{{ $salon->activo ? 'Activo' : 'Inactivo' }}</td>
-                                <td style="padding:8px;"><button form="editar-salon-{{ $salon->id }}" type="submit" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; padding:7px 10px; border-radius:6px; cursor:pointer;">Guardar</button></td>
-                                <td style="padding:8px;"><form action="{{ route('salones.nombres.estado', $salon) }}" method="POST" onsubmit="return confirm('¿{{ $salon->activo ? 'Dar de baja' : 'Activar' }} este nombre?');">
-                                                @csrf @method('PATCH')
-                                                <button type="submit" style="background:{{ $salon->activo ? '#fff7ed' : '#f0fdf4' }}; color:{{ $salon->activo ? '#c2410c' : '#15803d' }}; border:1px solid {{ $salon->activo ? '#fed7aa' : '#bbf7d0' }}; padding:7px 10px; border-radius:6px; cursor:pointer; white-space:nowrap;">{{ $salon->activo ? 'Dar de baja' : 'Activar' }}</button>
-                                            </form>
+                                    </form>
                                 </td>
-                                @else
-                                <td style="padding:8px;">{{ $salon->nombre }}</td>
-                                <td style="padding:8px;"><span style="display:inline-block; width:18px; height:18px; vertical-align:middle; border-radius:4px; background:{{ $salon->color }};"></span></td>
-                                <td style="padding:8px;">{{ $salon->orden }}</td>
-                                <td style="padding:8px; color:{{ $salon->activo ? '#15803d' : '#64748b' }};">{{ $salon->activo ? 'Activo' : 'Inactivo' }}</td>
-                                @endif
+                                
+                                {{-- SECCIÓN COLOR EDITABLE (Conectado al form principal por ID) --}}
+                                <td style="padding:8px;">
+                                    <input form="editar-salon-{{ $salon->id }}" type="color" name="color" value="{{ $salon->color }}" required title="Cambiar color" style="display:inline-block; width:36px; height:32px; border:1px solid #cbd5e1; border-radius:4px; padding:1px; cursor:pointer;">
+                                </td>
+                                
+                                {{-- ORDEN EDITABLE --}}
+                                <td style="padding:8px;">
+                                    <input form="editar-salon-{{ $salon->id }}" type="number" name="orden" value="{{ $salon->orden }}" min="0" max="9999" required aria-label="Orden" style="width:74px; border:1px solid #cbd5e1; border-radius:6px; padding:7px;">
+                                </td>
+                                
+                                {{-- ESTADO --}}
+                                <td style="padding:8px; color:{{ $salon->activo ? '#15803d' : '#64748b' }}; font-weight: 500;">
+                                    {{ $salon->activo ? 'Activo' : 'Inactivo' }}
+                                </td>
+                                
+                                {{-- BOTÓN GUARDAR EDICIÓN --}}
+                                <td style="padding:8px;">
+                                    <button form="editar-salon-{{ $salon->id }}" type="submit" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; padding:7px 10px; border-radius:6px; cursor:pointer;">
+                                        Guardar
+                                    </button>
+                                </td>
+                                
+                                {{-- ACCIONES (Dar de baja / Eliminar) --}}
+                                <td style="padding:8px;">
+                                    <div style="display: flex; gap: 8px; align-items: center;">
+                                        
+                                        {{-- Botón Dar de baja / Activar (Disponible para Admin y Superadmin) --}}
+                                        <form action="{{ route('salones.nombres.estado', $salon) }}" method="POST" onsubmit="return confirm('¿{{ $salon->activo ? 'Dar de baja' : 'Activar' }} este nombre?');" style="margin: 0;">
+                                            @csrf @method('PATCH')
+                                            <button type="submit" style="background:{{ $salon->activo ? '#fff7ed' : '#f0fdf4' }}; color:{{ $salon->activo ? '#c2410c' : '#15803d' }}; border:1px solid {{ $salon->activo ? '#fed7aa' : '#bbf7d0' }}; padding:7px 10px; border-radius:6px; cursor:pointer; white-space:nowrap;">
+                                                {{ $salon->activo ? 'Dar de baja' : 'Activar' }}
+                                            </button>
+                                        </form>
+
+                                        {{-- Botón Eliminar DEFINITIVO (Solo Admin) --}}
+                                        @if(auth()->user()->rol === 'admin')
+                                        <form action="{{ route('salones.nombres.destroy', $salon->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este salón definitivamente? El orden de los demás salones se recalculará automáticamente.');" style="margin: 0;">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" style="background:#fef2f2; color:#dc2626; border:1px solid #fecaca; padding:7px 10px; border-radius:6px; cursor:pointer;" title="Eliminar definitivamente">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </button>
+                                        </form>
+                                        @endif
+                                        
+                                    </div>
+                                </td>
                             </tr>
                         @endforeach
                         </tbody>

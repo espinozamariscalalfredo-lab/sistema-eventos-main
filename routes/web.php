@@ -45,6 +45,7 @@ Route::middleware('auth')->group(function () {
     // Pantalla del calendario y herramientas de supervisión.
     Route::get('/salones/usar', [SalonController::class, 'calendario'])->name('salones.usar');
     Route::get('/salones/supervisar', [ReservaController::class, 'supervisar'])->name('salones.supervisar');
+    Route::delete('/salones/nombres/{id}', [SalonController::class, 'destroy'])->name('salones.nombres.destroy');
 
     Route::get('/salones/reservas/{id}/protocolo', [ReservaController::class, 'mostrarProtocolo'])->name('salones.protocolo');
     Route::put('/salones/reservas/{id}/protocolo', [ReservaController::class, 'actualizarProtocolo'])->name('salones.protocolo.update');
