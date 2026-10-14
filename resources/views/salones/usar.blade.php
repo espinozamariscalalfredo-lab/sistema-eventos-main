@@ -253,62 +253,101 @@
         </div>
         <!-- MODAL FLOTANTE "NUEVA RESERVA" -->
         <div id="booking-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center;">
-            <div style="background: white; width: 600px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); overflow: hidden;">
+            <div style="background: white; width: 550px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); overflow: hidden; font-family: sans-serif;">
                 
                 <!-- Cabecera del Modal -->
-                <div style="padding: 16px 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
-                    <h3 style="font-size: 16px; font-weight: bold; color: #475b75;">Nueva reserva</h3>
-                    <button id="close-modal" style="background: none; border: none; font-size: 18px; cursor: pointer; color: #9ca3af;"><i class="fa-solid fa-xmark"></i></button>
+                <div style="padding: 16px 24px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background-color: #f8fafc;">
+                    <h3 style="font-size: 16px; font-weight: 500; color: #334155; margin: 0;">Nueva reserva</h3>
+                    <button id="close-modal" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b; line-height: 1; padding: 0;">&times;</button>
                 </div>
 
                 <!-- Cuerpo del Formulario -->
-                <form id="booking-form" style="padding: 20px;">
+                <form id="booking-form" style="padding: 24px;">
                     @csrf
-                    <div style="display: flex; gap: 10px; margin-bottom: 16px; align-items: center;">
-                        <i class="fa-regular fa-clock" style="color: #6b7280;"></i>
-                        <input type="text" id="modal-start" name="fecha_inicio" style="border: 1px solid #d1d5db; border-radius: 4px; padding: 6px; font-size: 13px; width: 180px;" required>
-                        <span>hasta</span>
-                        <input type="text" id="modal-end" name="fecha_fin" style="border: 1px solid #d1d5db; border-radius: 4px; padding: 6px; font-size: 13px; width: 180px;" required>
+                    
+                    <!-- ====== SECCIÓN SUPERIOR (Íconos a la izquierda) ====== -->
+                    
+                    <!-- Fila: Fechas -->
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                        <div style="width: 24px; text-align: center; color: #64748b; font-size: 18px;">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                            <input type="text" id="modal-start" name="fecha_inicio" style="flex: 1; border: none; background: #f1f5f9; border-radius: 6px; padding: 10px 12px; font-size: 14px; color: #1e293b; outline: none;" required>
+                            <span style="font-size: 15px; color: #475b75;">hasta</span>
+                            <input type="text" id="modal-end" name="fecha_fin" style="flex: 1; border: none; background: #f1f5f9; border-radius: 6px; padding: 10px 12px; font-size: 14px; color: #1e293b; outline: none;" required>
+                        </div>
                     </div>
 
-                    <div style="margin-bottom: 16px;">
-                        <textarea id="modal-title" name="titulo" placeholder="Descripción *" rows="2" style="width: 100%; border: 1px solid #d1d5db; border-radius: 4px; padding: 8px; font-size: 13px;" required></textarea>
+                    <!-- Fila: Descripción -->
+                    <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
+                        <div style="width: 24px; text-align: center; color: #64748b; font-size: 18px; padding-top: 10px;">
+                            <i class="fa-solid fa-align-left"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <textarea id="modal-title" name="titulo" maxlength="150" placeholder="Descripción *" rows="2" style="width: 100%; border: none; background: #f1f5f9; border-radius: 6px; padding: 10px 12px; font-size: 14px; color: #1e293b; outline: none; resize: none;" required></textarea>
+                        </div>
                     </div>
 
-                    <div style="margin-bottom: 16px;">
-                        <input type="text" id="modal-username" name="nombre_usuario" value="{{ Auth::user()->nombre }}" placeholder="Nombre de usuario" style="width: 100%; border: 1px solid #d1d5db; border-radius: 4px; padding: 8px; font-size: 13px; background: #f9fafb;">
+                    <!-- Fila: Nombre de usuario -->
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                        <div style="width: 24px; text-align: center; color: #64748b; font-size: 18px;">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <input type="text" maxlength="70" id="modal-username" name="nombre_usuario" value="{{ Auth::user()->nombre }}" placeholder="Nombre de usuario" style="width: 100%; border: none; background: #f1f5f9; border-radius: 6px; padding: 10px 12px; font-size: 14px; color: #1e293b; outline: none;">
+                        </div>
                     </div>
 
-                    <div style="margin-bottom: 16px;">
-                        <input type="text" id="modal-phone" name="telefono_usuario" placeholder="Teléfono" style="width: 100%; border: 1px solid #d1d5db; border-radius: 4px; padding: 8px; font-size: 13px;">
+                    <!-- Fila: Teléfono -->
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 8px;">
+                        <div style="width: 24px; text-align: center; color: #64748b; font-size: 18px;">
+                            <i class="fa-solid fa-mobile-screen"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <input type="tel" id="modal-phone" name="telefono_usuario" placeholder="Teléfono" maxlength="15" oninput="this.value = this.value.replace(/[^0-9]/g, '')" style="width: 100%; border: none; background: #f1f5f9; border-radius: 6px; padding: 10px 12px; font-size: 14px; color: #1e293b; outline: none;">
+                        </div>
                     </div>
 
-                    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+                    <!-- ====== LÍNEA SEPARADORA ====== -->
+                    <!-- Usamos márgenes negativos para que la línea abarque todo el ancho del modal ignorando el padding -->
+                    <div style="height: 1px; background-color: #e2e8f0; margin: 24px -24px;"></div>
 
-                    <div style="margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
-                        <label style="width: 160px; font-size: 13px; color: #4b5563;">Nombre de autoridad *</label>
-                        <input type="text" name="nombre_autoridad" style="flex: 1; border: 1px solid #d1d5db; border-radius: 4px; padding: 6px; font-size: 13px;">
+                    <!-- ====== SECCIÓN INFERIOR (Etiquetas a la izquierda) ====== -->
+
+                    <!-- Fila: Nombre de autoridad -->
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                        <label style="width: 180px; font-size: 14px; color: #334155; font-weight: 500;">Nombre de autoridad *</label>
+                        <div style="flex: 1;">
+                            <input type="text" maxlength="50" name="nombre_autoridad" style="width: 100%; border: none; background: #f1f5f9; border-radius: 6px; padding: 10px 12px; font-size: 14px; color: #1e293b; outline: none;">
+                        </div>
                     </div>
 
-                    <div style="margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
-                        <label style="width: 160px; font-size: 13px; color: #4b5563;">Responsable del evento *</label>
-                        <textarea name="responsable" rows="2" style="flex: 1; border: 1px solid #d1d5db; border-radius: 4px; padding: 6px; font-size: 13px;"></textarea>
+                    <!-- Fila: Responsable del evento -->
+                    <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
+                        <label style="width: 180px; font-size: 14px; color: #334155; font-weight: 500; padding-top: 10px;">Responsable del evento *</label>
+                        <div style="flex: 1;">
+                            <textarea name="responsable" maxlength="40" rows="3" style="width: 100%; border: none; background: #f1f5f9; border-radius: 6px; padding: 10px 12px; font-size: 14px; color: #1e293b; outline: none; resize: none;"></textarea>
+                        </div>
                     </div>
 
-                    <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                        <label style="width: 160px; font-size: 13px; color: #4b5563;">Salones</label>
-                        <select name="salon" style="flex: 1; border: 1px solid #d1d5db; border-radius: 4px; padding: 6px; font-size: 13px;" required>
-                            {{-- Ofrece al crear la misma lista de salones que aparece en la leyenda. --}}
-                            @foreach($salonesActivos as $salon)
-                                <option value="{{ $salon->nombre }}">{{ $salon->nombre }}</option>
-                            @endforeach
-                        </select>
+                    <!-- Fila: Salones -->
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+                        <label style="width: 180px; font-size: 14px; color: #334155; font-weight: 500;">Salones</label>
+                        <div style="flex: 1;">
+                            <!-- El select conserva un borde sutil y fondo claro para verse como en la original -->
+                            <select name="salon" style="width: 100%; border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 6px; padding: 10px 12px; font-size: 14px; color: #1e293b; outline: none;" required>
+                                @foreach($salonesActivos as $salon)
+                                    <option value="{{ $salon->nombre }}">{{ $salon->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
 
-                    <!-- Botones de Acción -->
-                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                        <button type="button" id="btn-cancel" style="background: white; border: 1px solid #d1d5db; padding: 6px 16px; border-radius: 4px; font-size: 13px; cursor: pointer;">Cancelar</button>
-                        <button type="submit" style="background: #2563eb; color: white; border: none; padding: 6px 16px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer;">Crear reserva</button>
+                    <!-- ====== BOTONES DE ACCIÓN ====== -->
+                    <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                        <button type="button" id="btn-cancel" style="background: white; border: 1px solid #cbd5e1; color: #64748b; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; transition: background 0.2s;">Cancelar</button>
+                        <button type="submit" style="background: #2563eb; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.2s;">Crear reserva</button>
                     </div>
                 </form>
             </div>
