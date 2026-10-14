@@ -33,6 +33,75 @@
         .fc-reserva-hora { margin-bottom: 3px; font-weight: 800; }
         .fc-reserva-titulo { font-weight: 600; }
         .fc-reserva-detalle { font-size: 0.92em; }
+        /* ESTILOS PARA LA VISTA MENSUAL (Efecto pastilla delgada) */
+        .fc-dayGridMonth-view .fc-event {
+            border-radius: 99px !important; /* Bordes completamente redondeados */
+            border: none !important;
+            margin-bottom: 2px !important; /* Espaciado entre pastillas */
+            overflow: hidden;
+            box-shadow: none !important;
+        }
+        
+        .fc-dayGridMonth-view .fc-event-main {
+            padding: 2px 6px !important; /* Define la altura delgada de la pastilla */
+            display: flex;
+            align-items: center;
+        }
+
+        .fc-dayGridMonth-view .fc-reserva-contenido {
+            display: flex;
+            flex-direction: row; /* Alinea hora y título lado a lado */
+            align-items: center;
+            width: 100%;
+            gap: 4px; /* Separación entre hora y título */
+            line-height: 1;
+        }
+
+        .fc-dayGridMonth-view .fc-reserva-hora {
+            font-weight: 800;
+            font-size: 10px; /* Letra muy pequeña como en la referencia */
+            margin-bottom: 0 !important; /* Sobreescribe el margen de las otras vistas */
+            color: white;
+            white-space: nowrap;
+        }
+
+        .fc-dayGridMonth-view .fc-reserva-titulo {
+            font-weight: 500;
+            font-size: 10px;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* Corta el texto largo con "..." */
+        }
+        /* 1. Fijar altura uniforme para todos los cuadros del mes */
+        .fc-dayGridMonth-view .fc-daygrid-day-frame {
+            height: 140px !important; 
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 2. Habilitar scroll interno con la rueda del ratón para los eventos */
+        .fc-dayGridMonth-view .fc-daygrid-day-events {
+            flex-grow: 1;
+            max-height: 105px !important; /* Limita el crecimiento */
+            overflow-y: auto !important; /* Activa el desplazamiento interno */
+            margin-bottom: 2px;
+        }
+
+        /* 3. Diseño elegante para la barra de scroll (Oculta la barra fea por defecto) */
+        .fc-dayGridMonth-view .fc-daygrid-day-events::-webkit-scrollbar {
+            width: 4px; /* Barra muy delgada */
+        }
+        .fc-dayGridMonth-view .fc-daygrid-day-events::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        .fc-dayGridMonth-view .fc-daygrid-day-events::-webkit-scrollbar-thumb {
+            background: #cbd5e1; /* Color plomo suave */
+            border-radius: 10px;
+        }
+        .fc-dayGridMonth-view .fc-daygrid-day-events::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; /* Oscurece un poco al pasar el cursor */
+        }
         /* Se atenúan únicamente eventos terminados, manteniendo el color del salón en todas las vistas. */
         .fc .fc-event.reserva-finalizada { opacity: 0.55; }
 
@@ -448,16 +517,19 @@
                     var contenido = document.createElement('div');
                     contenido.className = 'fc-reserva-contenido';
 
-                    // El mes conserva el color del salón y muestra hora, minutos y título.
+                    // El mes adopta forma de pastilla delgada con elementos en línea
                     if (arg.view.type === 'dayGridMonth') {
-                        var horaMes = document.createElement('div');
+                        var horaMes = document.createElement('span'); // Cambiado a span
                         horaMes.className = 'fc-reserva-hora';
-                        horaMes.textContent = arg.timeText || '';
+                        // Cortamos el string para que solo muestre la hora de inicio (ej. "09:00") y ahorre espacio
+                        horaMes.textContent = arg.timeText.split(' - ')[0] || arg.timeText; 
                         contenido.appendChild(horaMes);
-                        var tituloMes = document.createElement('div');
+                        
+                        var tituloMes = document.createElement('span'); // Cambiado a span
                         tituloMes.className = 'fc-reserva-titulo';
                         tituloMes.textContent = arg.event.title || '';
                         contenido.appendChild(tituloMes);
+                        
                         return { domNodes: [contenido] };
                     }
 

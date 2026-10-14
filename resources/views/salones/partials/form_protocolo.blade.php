@@ -44,9 +44,25 @@
         @else
             <select name="tipo_evento" class="w-full border border-gray-300 rounded-md p-2.5 text-sm bg-white">
                 <option value="Reconocimientos" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Reconocimientos') ? 'selected' : '' }}>Reconocimientos</option>
+                <option value="Conmemoracion" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Conmemoracion') ? 'selected' : '' }}>Conmemoracion</option>
+                <option value="Directiva" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Directiva') ? 'selected' : '' }}>Directiva</option>
+                <option value="Sesion plenaria" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Sesion plenaria') ? 'selected' : '' }}>Sesion plenaria</option>
+                <option value="Seminario" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Seminario') ? 'selected' : '' }}>Seminario</option>
+                <option value="Taller" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Taller') ? 'selected' : '' }}>Taller</option>
+                <option value="Capacitacion" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Capacitacion') ? 'selected' : '' }}>Capacitacion</option>
+                <option value="Feria" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Feria') ? 'selected' : '' }}>Feria</option>
+                <option value="Conferencia de prensa" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Conferencia de prensa') ? 'selected' : '' }}>Conferencia de prensa</option>
+                <option value="Visita guiada" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Visita guiada') ? 'selected' : '' }}>Visita guiada</option>
+                <option value="Exposicion" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Exposicion') ? 'selected' : '' }}>Exposicion</option>
+                <option value="Desayuno" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Desayuno') ? 'selected' : '' }}>Desayuno</option>
                 <option value="Reunión" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Reunión') ? 'selected' : '' }}>Reunión</option>
-                <option value="Conferencia" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Conferencia') ? 'selected' : '' }}>Conferencia</option>
-                <option value="Taller / Seminario" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Taller / Seminario') ? 'selected' : '' }}>Taller / Seminario</option>
+                <option value="Directiva" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Directiva') ? 'selected' : '' }}>Directiva</option>
+                <option value="Mesa de trabajo" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Mesa de trabajo') ? 'selected' : '' }}>Mesa de trabajo</option>
+                <option value="Celebracion" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Celebracion') ? 'selected' : '' }}>Celebracion</option>
+                <option value="Lanzamiento" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Lanzamiento') ? 'selected' : '' }}>Lanzamiento</option>
+                <option value="Concierto" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Concierto') ? 'selected' : '' }}>Concierto</option>
+                <option value="Almuerzo" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Almuerzo') ? 'selected' : '' }}>Almuerzo</option>
+                <option value="Cena" {{ (old('tipo_evento', $reserva->tipo_evento ?? '') == 'Cena') ? 'selected' : '' }}>Cena</option>
             </select>
         @endif
     </div>
@@ -81,8 +97,8 @@
         @else
             <select name="tipo_ingreso" class="w-full border border-gray-300 rounded-md p-2.5 text-sm bg-white">
                 <option value="Libre" {{ (old('tipo_ingreso', $reserva->tipo_ingreso ?? '') == 'Libre') ? 'selected' : '' }}>Libre</option>
-                <option value="Con invitación" {{ (old('tipo_ingreso', $reserva->tipo_ingreso ?? '') == 'Con invitación') ? 'selected' : '' }}>Con invitación</option>
-                <option value="Lista cerrada" {{ (old('tipo_ingreso', $reserva->tipo_ingreso ?? '') == 'Lista cerrada') ? 'selected' : '' }}>Lista cerrada</option>
+                <option value="Bajo Lista" {{ (old('tipo_ingreso', $reserva->tipo_ingreso ?? '') == 'Bajo Lista') ? 'selected' : '' }}>Bajo Lista</option>
+                <option value="Interno" {{ (old('tipo_ingreso', $reserva->tipo_ingreso ?? '') == 'Interno') ? 'selected' : '' }}>Interno</option>
             </select>
         @endif
         <p class="text-xs text-gray-400 mt-1">Como ingresarán al edificio</p>

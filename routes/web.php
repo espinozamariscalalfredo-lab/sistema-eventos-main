@@ -56,6 +56,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/api/reservas/fechas', [SalonController::class, 'fechasConReservas'])
         ->name('api.reservas.fechas');
+
+    Route::view('/salones/asientos', 'salones.asientos')->name('salones.asientos');
 });
 
 require __DIR__.'/auth.php';
