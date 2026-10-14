@@ -482,7 +482,7 @@
                         : [];
                 },
                 slotMinTime: '08:00:00',
-                slotMaxTime: '18:00:00', 
+                slotMaxTime: '22:00:00', 
                 slotLabelFormat: { hour: 'numeric', minute: '2-digit', omitZeroMinute: false, meridiem: false }, 
                 // En la vista mensual también se muestran hora y minutos en formato de 24 horas.
                 eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
