@@ -97,23 +97,58 @@ class ReservaController extends Controller
         if (!in_array(auth()->user()->rol, ['admin', 'superadmin'], true)) {
             return response()->json(['success' => false, 'message' => 'No tienes permiso para crear.'], 403);
         }
+        
+        // AHORA VALIDAMOS TODOS LOS CAMPOS DEL FORMULARIO UNIFICADO
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
             'fecha_inicio' => 'required|date',
             'fecha_fin' => 'required|date|after:fecha_inicio',
             'nombre_usuario' => 'nullable|string',
-            'telefono_usuario' => 'nullable|string',
             'nombre_autoridad' => 'nullable|string',
             'responsable' => 'nullable|string',
+            'nombre_coordinador_externo' => 'nullable|string',
+            'telefono_coordinador_externo' => 'nullable|string',
+            'tipo_evento' => 'nullable|string',
+            'aforo' => 'nullable|integer',
+            'tipo_ingreso' => 'nullable|string',
+            'requerimientos' => 'nullable|array',
+            'requerimientos_especiales' => 'nullable|string',
+            'registrado_por' => 'nullable|string',
             'salon' => ['required', 'string', Rule::in($this->salonesValidos())],
         ]);
 
-        $validated['modificado_por'] = $this->actorActual();
-        $reserva = Reserva::create($validated);
+        // ==========================================
+        // VALIDACIÓN: PREVENIR CRUCE DE HORARIOS
+        // ==========================================
+        $conflicto = Reserva::where('salon', $validated['salon'])
+            ->where(function ($query) use ($validated) {
+                $query->where(function ($q) use ($validated) {
+                    $q->where('fecha_inicio', '<=', $validated['fecha_inicio'])
+                      ->where('fecha_fin', '>', $validated['fecha_inicio']);
+                })->orWhere(function ($q) use ($validated) {
+                    $q->where('fecha_inicio', '<', $validated['fecha_fin'])
+                      ->where('fecha_fin', '>=', $validated['fecha_fin']);
+                })->orWhere(function ($q) use ($validated) {
+                    $q->where('fecha_inicio', '>=', $validated['fecha_inicio'])
+                      ->where('fecha_fin', '<=', $validated['fecha_fin']);
+                });
+            })
+            ->first();
 
+        if ($conflicto) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'El salón "' . $validated['salon'] . '" ya está ocupado en ese horario.'
+            ], 422);
+        }
+        // ==========================================
+
+        $validated['modificado_por'] = $this->actorActual();
+        Reserva::create($validated);
+
+        // Como unificamos todo, ya no necesitamos redireccionar. JavaScript cerrará el modal solo.
         return response()->json([
-            'success' => true,
-            'redirect_url' => route('salones.protocolo', $reserva->id),
+            'success' => true
         ]);
     }
 
@@ -145,6 +180,29 @@ class ReservaController extends Controller
             'salon' => ['required', 'string', Rule::in($this->salonesValidos($reserva))],
         ]);
 
+        // VALIDACIÓN DE CRUCE AL EDITAR (Excluyendo el ID actual)
+        $conflicto = Reserva::where('salon', $validated['salon'])
+            ->where('id', '!=', $id) // <-- Esta línea es vital para que no choque consigo misma
+            ->where(function ($query) use ($validated) {
+                $query->where(function ($q) use ($validated) {
+                    $q->where('fecha_inicio', '<=', $validated['fecha_inicio'])
+                      ->where('fecha_fin', '>', $validated['fecha_inicio']);
+                })->orWhere(function ($q) use ($validated) {
+                    $q->where('fecha_inicio', '<', $validated['fecha_fin'])
+                      ->where('fecha_fin', '>=', $validated['fecha_fin']);
+                })->orWhere(function ($q) use ($validated) {
+                    $q->where('fecha_inicio', '>=', $validated['fecha_inicio'])
+                      ->where('fecha_fin', '<=', $validated['fecha_fin']);
+                });
+            })
+            ->first();
+
+        if ($conflicto) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'No puedes mover la reserva a este horario. El salón ya está ocupado.'
+            ], 422);
+        }
         $validated['modificado_por'] = $this->actorActual();
         $reserva->update($validated);
 
