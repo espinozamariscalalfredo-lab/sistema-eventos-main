@@ -1,5 +1,7 @@
 <x-app-layout>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {{-- Cambio: 15/10/2026. SweetAlert2 unifica los avisos de esta pantalla. --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         /* Acciones de la tabla con el mismo trazo azul ligero del resto del sistema. */
         .tabla-icono-accion { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; margin-left: 4px; border: 0; border-radius: 7px; background: transparent; color: #3b82f6; font-size: 16px; text-decoration: none; cursor: pointer; transition: background-color .15s ease, color .15s ease; }
@@ -20,16 +22,6 @@
                 <h2 style="font-size: 19px; font-weight: bold; color: #475b75; margin-bottom: 6px;">Nombres de eventos del calendario</h2>
                 <p style="font-size: 13px; color: #64748b; margin-bottom: 14px;">Consulta y administra los salones. Ahora puedes editar el nombre, el color y el orden guardando los cambios.</p>
                 
-                @if(session('estado_catalogo'))
-                    <p role="status" style="padding: 9px 12px; margin-bottom: 12px; color: #166534; background: #f0fdf4; border-radius: 6px;">{{ session('estado_catalogo') }}</p>
-                @endif
-                @if(session('error_catalogo'))
-                    <p role="alert" style="padding: 9px 12px; margin-bottom: 12px; color: #b91c1c; background: #fef2f2; border-radius: 6px;">{{ session('error_catalogo') }}</p>
-                @endif
-                @if($errors->any())
-                    <div role="alert" style="padding: 9px 12px; margin-bottom: 12px; color: #b91c1c; background: #fef2f2; border-radius: 6px;">{{ $errors->first() }}</div>
-                @endif
-
                 <form action="{{ route('salones.nombres.store') }}" method="POST" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: end; margin-bottom: 16px;">
                     @csrf
                     <label style="font-size: 12px; color: #475569;">Nuevo nombre
@@ -249,6 +241,30 @@
     </div>
 
     <script>
+        // Cambio: 15/10/2026. Muestra avisos flash de usuarios, salones y validación.
+        function mostrarAvisoUsuarios(aviso) {
+            Swal.fire({
+                icon: aviso.tipo,
+                title: aviso.titulo,
+                text: aviso.mensaje,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: true
+            });
+        }
+
+        @if(session('notificacion'))
+            mostrarAvisoUsuarios(@json(session('notificacion')));
+        @elseif(session('estado_catalogo'))
+            mostrarAvisoUsuarios({ tipo: 'success', titulo: '¡Listo!', mensaje: @json(session('estado_catalogo')) });
+        @elseif(session('error_catalogo'))
+            mostrarAvisoUsuarios({ tipo: 'error', titulo: 'No se pudo completar', mensaje: @json(session('error_catalogo')) });
+        @elseif($errors->any())
+            mostrarAvisoUsuarios({ tipo: 'error', titulo: 'Revisa los datos', mensaje: @json($errors->first()) });
+        @endif
+
         function openEditModal(id, name, email, role) {
             document.getElementById('edit-nombre').value = name;
             document.getElementById('edit-correo').value = email;

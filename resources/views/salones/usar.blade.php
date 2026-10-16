@@ -103,6 +103,9 @@
         }
         .fc .fc-event.reserva-finalizada { opacity: 0.55; }
 
+        /* Carriles fijos por salón: 15/10/2026. */
+        .salones-calendar-scroll { overflow-x: auto; }
+
         .mini-cal { width: 100%; text-align: center; font-size: 13px; border-collapse: separate; border-spacing: 2px; }
         .mini-cal th { color: #9ca3af; font-weight: normal; font-size: 12px; padding-bottom: 4px; }
         .mini-cal td { padding: 5px 0; border-radius: 4px; cursor: pointer; color: #4b5563; font-weight: 500; transition: background 0.2s; background-color: #ffffff; }
@@ -148,6 +151,32 @@
             .edit-modal-panel { max-height: calc(100dvh - 24px) !important; }
         }
         .edit-modal-drag-handle { cursor: move; touch-action: none; user-select: none; }
+        .fc-reserva-contenido-semana {
+            position: relative;
+            height: 100%;
+            overflow: visible;
+            text-align: center;
+        }
+        .fc-reserva-contenido-semana .fc-reserva-hora {
+            white-space: nowrap;
+            overflow: visible;
+            text-align: center;
+            font-size: 10px;
+        }
+        .fc-reserva-titulo-semana {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: max-content;
+            max-width: none;
+            transform: translate(-50%, -50%) rotate(90deg);
+            white-space: nowrap;
+            text-align: center;
+            font-weight: 700;
+            line-height: 1.05;
+            z-index: 2;
+        }
+        .fc-timegrid-event, .fc-timegrid-event .fc-event-main { overflow: visible !important; }
     </style>
 
     <div class="min-h-screen bg-white py-6 px-4 sm:px-8">
@@ -610,6 +639,34 @@
             var reservaParaEditar = parametrosInicio.get('editar');
             var salonOrder = Object.keys(salonColors);
 
+            function ajustarAnchoCarriles(viewType) {
+                if (viewType === 'dayGridMonth' || viewType === 'timeGridWeek') {
+                    calendarEl.style.minWidth = '100%';
+                    return;
+                }
+
+                calendarEl.style.minWidth = Math.max(560, salonOrder.length * 80 + 55) + 'px';
+            }
+
+            function posicionarEventoEnCarril(info) {
+                var salonIndex = salonOrder.indexOf(info.event.extendedProps.salon);
+                if (salonIndex < 0) return;
+
+                var count = Math.max(salonOrder.length, 1);
+                var width = 100 / count;
+                var harness = info.el.parentElement;
+
+                if (info.view.type === 'dayGridMonth') {
+                    return;
+                }
+
+                if (info.view.type === 'timeGridDay' || info.view.type === 'timeGridWeek') {
+                    harness.style.setProperty('left', (salonIndex * width) + '%', 'important');
+                    harness.style.setProperty('right', (100 - ((salonIndex + 1) * width)) + '%', 'important');
+                    harness.style.setProperty('width', 'auto', 'important');
+                }
+            }
+
             function compareEventsBySalon(a, b) {
                 var salonA = a.extendedProps.salon;
                 var salonB = b.extendedProps.salon;
@@ -675,7 +732,7 @@
                 initialDate: parametrosInicio.get('fecha') || undefined,
                 locale: 'es',
                 firstDay: 0,
-                height: 800, 
+                height: 800,
                 allDaySlot: false, 
                 slotEventOverlap: false,
                 eventOrder: compareEventsBySalon,
@@ -687,6 +744,7 @@
                         ? ['reserva-finalizada']
                         : [];
                 },
+                slotDuration: '00:30:00',
                 slotMinTime: '08:00:00',
                 slotMaxTime: '22:00:00', 
                 slotLabelFormat: { hour: 'numeric', minute: '2-digit', omitZeroMinute: false, meridiem: false }, 
@@ -743,22 +801,24 @@
                     contenido.appendChild(hora);
 
                     if (arg.view.type === 'timeGridWeek') {
+                        contenido.classList.add('fc-reserva-contenido-semana');
+
+                        var tituloSemana = document.createElement('div');
+                        tituloSemana.className = 'fc-reserva-titulo-semana';
+                        tituloSemana.textContent = props.salon || '';
+                        contenido.appendChild(tituloSemana);
+
                         return { domNodes: [contenido] };
                     }
 
+                    // Día: limita el bloque al resumen de la imagen (15/10/2026).
                     var detalles = [
                         { valor: arg.event.title, clase: 'fc-reserva-titulo' },
                         { valor: props.nombre_coordinador_externo, clase: 'fc-reserva-detalle' },
                         { valor: props.telefono_coordinador_externo || props.telefono_usuario, clase: 'fc-reserva-detalle' },
                         { valor: props.nombre_autoridad, clase: 'fc-reserva-detalle' },
                         { valor: props.responsable, clase: 'fc-reserva-detalle' },
-                        { valor: props.tipo_evento, clase: 'fc-reserva-detalle' },
-                        { valor: props.requerimientos_especiales, clase: 'fc-reserva-detalle' },
-                        { valor: Array.isArray(props.requerimientos) ? props.requerimientos.join(', ') : props.requerimientos, clase: 'fc-reserva-detalle' },
-                        { valor: props.aforo ? 'Aforo: ' + props.aforo : '', clase: 'fc-reserva-detalle' },
-                        { valor: props.nombre_usuario, clase: 'fc-reserva-detalle' },
-                        { valor: props.registrado_por, clase: 'fc-reserva-detalle' },
-                        { valor: props.coordinador_interno, clase: 'fc-reserva-detalle' }
+                        { valor: props.nombre_usuario, clase: 'fc-reserva-detalle' }
                     ];
 
                     detalles.forEach(function(detalle) {
@@ -773,6 +833,8 @@
                 },
 
                 eventDidMount: function(info) {
+                    posicionarEventoEnCarril(info);
+
                     var props = info.event.extendedProps;
                     var detalles = [
                         info.event.title,
@@ -848,6 +910,8 @@
                     };
                 },
                 datesSet: function(info) {
+                    ajustarAnchoCarriles(info.view.type);
+
                     var titleEl = document.getElementById('calendar-title');
                     if (info.view.type === 'timeGridWeek') {
                         var weekNumber = getWeekNumber(info.view.currentStart);

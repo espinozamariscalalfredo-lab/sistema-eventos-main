@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 
 // Muestra las cuentas y gestiona las acciones permitidas al administrador.
 // Cambio documentado: 13/10/2026. Los permisos se comprueban también aquí.
+// Cambio: 15/10/2026. Las acciones devuelven avisos para la pantalla.
 class UsuarioController extends Controller
 {
     // Carga cuentas y el catálogo visible para admin y superadmin.
@@ -41,7 +42,11 @@ class UsuarioController extends Controller
             'rol' => $request->rol,
         ]);
 
-        return back();
+        return back()->with('notificacion', [
+            'tipo' => 'success',
+            'titulo' => '¡Agregado!',
+            'mensaje' => 'El usuario se agregó correctamente.',
+        ]);
     }
 
     // Actualiza los datos de una cuenta; la contraseña solo cambia si se envía una nueva.
@@ -68,7 +73,11 @@ class UsuarioController extends Controller
         
         $usuario->save();
 
-        return back();
+        return back()->with('notificacion', [
+            'tipo' => 'success',
+            'titulo' => '¡Actualizado!',
+            'mensaje' => 'El usuario se actualizó correctamente.',
+        ]);
     }
 
     // Elimina una cuenta, excepto la cuenta que inició sesión.
@@ -78,10 +87,18 @@ class UsuarioController extends Controller
         
         // Evitar que el admin se borre a sí mismo por accidente
         if (auth()->id() == $id) {
-            return back(); 
+            return back()->with('notificacion', [
+                'tipo' => 'error',
+                'titulo' => 'Acción no permitida',
+                'mensaje' => 'No puedes eliminar tu propia cuenta.',
+            ]);
         }
 
         Usuario::findOrFail($id)->delete();
-        return back();
+        return back()->with('notificacion', [
+            'tipo' => 'success',
+            'titulo' => '¡Eliminado!',
+            'mensaje' => 'El usuario se eliminó correctamente.',
+        ]);
     }
 }
