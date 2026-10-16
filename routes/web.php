@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/salones/nombres', [SalonController::class, 'guardarNombre'])->name('salones.nombres.store');
     Route::put('/salones/nombres/{salon}', [SalonController::class, 'actualizarNombre'])->name('salones.nombres.update');
     Route::patch('/salones/nombres/{salon}/estado', [SalonController::class, 'cambiarEstado'])->name('salones.nombres.estado');
+    Route::get('/salones/exportar', [App\Http\Controllers\ReservaController::class, 'exportarCsv'])->name('salones.exportar');
 
     // Supervisión, historial y papelera de reservas.
     Route::get('/reservas/supervisar', [ReservaController::class, 'supervisarReservas'])->name('reservas.supervisar');

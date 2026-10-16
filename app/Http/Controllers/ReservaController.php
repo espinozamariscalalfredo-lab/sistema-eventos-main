@@ -73,23 +73,57 @@ class ReservaController extends Controller
         return response()->json($reservas);
     }
 
-    // Lista reservas y aplica el filtro de salón.
+    
+    // Lista reservas y permite filtrar por salón o responsable, independientemente.
     public function supervisar(Request $request)
     {
-        // El mismo catálogo PostgreSQL alimenta el filtro de la lista y el de la papelera.
-        $salones = Salon::orderBy('orden')->orderBy('nombre')->get();
+        // Catálogo de salones.
+        $salones = Salon::orderBy('orden')
+            ->orderBy('nombre')
+            ->get();
+
+        // Responsables registrados en las reservas.
+        $responsables = Reserva::whereNotNull('responsable')
+            ->where('responsable', '!=', '')
+            ->distinct()
+            ->orderBy('responsable')
+            ->pluck('responsable');
+
+        // Valores seleccionados en los filtros.
         $salonSeleccionado = $request->query('salon');
+        $responsableSeleccionado = $request->query('responsable');
+
         $consulta = Reserva::query();
-        if (is_string($salonSeleccionado) && $salonSeleccionado !== '') {
+
+        // Filtros independientes: si se selecciona responsable,
+        // se filtra por responsable; de lo contrario, por salón.
+        if (is_string($responsableSeleccionado) && $responsableSeleccionado !== '') {
+            $consulta->where('responsable', $responsableSeleccionado);
+        } elseif (is_string($salonSeleccionado) && $salonSeleccionado !== '') {
             $consulta->where('salon', $salonSeleccionado);
         }
 
-        $reservas = $consulta->orderBy('fecha_inicio', 'desc')->paginate(10)->withQueryString();
+        // Conserva el filtro al cambiar de página.
+        $reservas = $consulta
+            ->orderBy('fecha_inicio', 'desc')
+            ->paginate(10)
+            ->withQueryString();
+
+        // Se conserva la lógica existente del último cambio.
         $ultimoCambio = Reserva::withTrashed()
             ->orderByRaw('COALESCE(fecha_actualizacion, fecha_creacion) DESC')
             ->first();
-        return view('salones.supervisar', compact('reservas', 'salones', 'salonSeleccionado', 'ultimoCambio'));
+
+        return view('salones.supervisar', compact(
+            'reservas',
+            'salones',
+            'salonSeleccionado',
+            'responsables',
+            'responsableSeleccionado',
+            'ultimoCambio'
+        ));
     }
+
 
     // Crea una reserva desde el calendario.
     public function guardar(Request $request)
@@ -342,5 +376,76 @@ class ReservaController extends Controller
         Reserva::create($validated);
 
         return redirect()->route('reservas.supervisar')->with('success', 'Reserva creada con éxito');
+    }
+    // Exporta las reservas a CSV aplicando el filtro de salón si existe
+    public function exportarCsv(Request $request)
+    {
+        // 1. Obtener el filtro de la URL
+        $salonSeleccionado = $request->query('salon');
+        
+        // 2. Construir la consulta
+        $consulta = Reserva::query();
+        if (is_string($salonSeleccionado) && $salonSeleccionado !== '') {
+            $consulta->where('salon', $salonSeleccionado);
+        }
+
+        // Ordenamos por fecha para que el Excel tenga sentido
+        $reservas = $consulta->orderBy('fecha_inicio', 'asc')->get();
+
+        // 3. Crear el nombre del archivo
+        $nombreArchivo = 'reservas_';
+        $nombreArchivo .= $salonSeleccionado ? str_replace(' ', '_', $salonSeleccionado) : 'todos_los_salones';
+        $nombreArchivo .= '_' . date('Y-m-d_H-i') . '.csv';
+
+        // 4. Preparar la respuesta HTTP para forzar la descarga del CSV
+        $headers = [
+            "Content-type"        => "text/csv; charset=UTF-8",
+            "Content-Disposition" => "attachment; filename=$nombreArchivo",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        // 5. Generar el contenido del CSV
+        $callback = function() use($reservas) {
+            $file = fopen('php://output', 'w');
+            
+            // Para que Excel lea correctamente los acentos (BOM UTF-8)
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            // Escribir la cabecera (nombres de las columnas)
+            fputcsv($file, [
+                'Salón', 
+                'Título del Evento', 
+                'Fecha Inicio', 
+                'Fecha Fin', 
+                'Responsable', 
+                'Autoridad',
+                'Tipo de Evento',
+                'Aforo',
+                'Creado por',
+                'Fecha de Creación'
+            ], ';'); // Usamos punto y coma para que Excel lo separe en columnas fácilmente
+
+            // Escribir los datos fila por fila
+            foreach ($reservas as $reserva) {
+                fputcsv($file, [
+                    $reserva->salon,
+                    $reserva->titulo,
+                    $reserva->fecha_inicio,
+                    $reserva->fecha_fin,
+                    $reserva->responsable,
+                    $reserva->nombre_autoridad,
+                    $reserva->tipo_evento,
+                    $reserva->aforo,
+                    $reserva->nombre_usuario,
+                    $reserva->fecha_creacion
+                ], ';');
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }
