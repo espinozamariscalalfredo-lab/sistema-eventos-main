@@ -26,8 +26,9 @@ html[data-tema="oscuro"] .tabla-icono-accion,
 html[data-tema="oscuro"] [style*="background: transparent"],
 html[data-tema="oscuro"] [style*="background-color: transparent"] { background-color: #1e293b !important; }
 html[data-tema="oscuro"] #edit-booking-modal { background: transparent !important; }
-html[data-tema="oscuro"] .edit-modal-panel { background: rgba(17, 24, 39, 0.96) !important; border-color: #334155 !important; }
-html[data-tema="oscuro"] .edit-modal-drag-handle { background: rgba(30, 41, 59, 0.96) !important; }
+html[data-tema="oscuro"] #booking-modal { background: transparent !important;}
+html[data-tema="oscuro"] .edit-modal-panel { background: rgba(17, 24, 39, 0.94) !important; border-color: #334155 !important; }
+html[data-tema="oscuro"] .edit-modal-drag-handle { background: rgba(30, 41, 59, 0.94) !important; }
 
 html[data-tema="oscuro"] [style*="color: #475b75"],
 html[data-tema="oscuro"] [style*="color: #374151"],

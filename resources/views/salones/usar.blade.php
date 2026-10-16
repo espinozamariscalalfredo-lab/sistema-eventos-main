@@ -32,6 +32,26 @@
         .fc-timegrid-slot-label-cushion { font-size: 0.8rem; color: #475b75; }
         .fc-reserva-contenido { width: 100%; overflow: hidden; white-space: normal; overflow-wrap: anywhere; line-height: 1.12; }
         .fc-reserva-hora { margin-bottom: 3px; font-weight: 800; }
+        .fc-timeGridDay-view .fc-reserva-hora {
+            display: block;
+            margin-bottom: 3px;
+            font-weight: 1000 !important;
+            -webkit-text-stroke: 0.35px currentColor;
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+        .fc-timeGridDay-view .fc-timegrid-event,
+        .fc-timeGridDay-view .fc-timegrid-event .fc-event-main { overflow: hidden !important; }
+        .fc-timeGridDay-view .fc-reserva-contenido {
+            box-sizing: border-box;
+            max-width: 100%;
+            font-size: calc(1em - 2pt);
+            overflow: hidden;
+        }
+        .fc-timeGridDay-view .fc-reserva-titulo,
+        .fc-timeGridDay-view .fc-reserva-detalle {
+            font-weight: 400 !important;
+        }
         .fc-reserva-titulo { font-weight: 600; }
         .fc-reserva-detalle { font-size: 0.92em; }
         
@@ -103,6 +123,9 @@
         }
         .fc .fc-event.reserva-finalizada { opacity: 0.55; }
 
+        /* Carriles fijos por salón: 15/10/2026. */
+        .salones-calendar-scroll { overflow-x: auto; }
+
         .mini-cal { width: 100%; text-align: center; font-size: 13px; border-collapse: separate; border-spacing: 2px; }
         .mini-cal th { color: #9ca3af; font-weight: normal; font-size: 12px; padding-bottom: 4px; }
         .mini-cal td { padding: 5px 0; border-radius: 4px; cursor: pointer; color: #4b5563; font-weight: 500; transition: background 0.2s; background-color: #ffffff; }
@@ -148,6 +171,32 @@
             .edit-modal-panel { max-height: calc(100dvh - 24px) !important; }
         }
         .edit-modal-drag-handle { cursor: move; touch-action: none; user-select: none; }
+        .fc-reserva-contenido-semana {
+            position: relative;
+            height: 100%;
+            overflow: visible;
+            text-align: center;
+        }
+        .fc-reserva-contenido-semana .fc-reserva-hora {
+            white-space: nowrap;
+            overflow: visible;
+            text-align: center;
+            font-size: 10px;
+        }
+        .fc-reserva-titulo-semana {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: max-content;
+            max-width: none;
+            transform: translate(-50%, -50%) rotate(90deg);
+            white-space: nowrap;
+            text-align: center;
+            font-weight: 700;
+            line-height: 1.05;
+            z-index: 2;
+        }
+        .fc-timegrid-event, .fc-timegrid-event .fc-event-main { overflow: visible !important; }
     </style>
 
     <div class="min-h-screen bg-white py-6 px-4 sm:px-8">
@@ -610,6 +659,60 @@
             var reservaParaEditar = parametrosInicio.get('editar');
             var salonOrder = Object.keys(salonColors);
 
+            function ajustarAnchoCarriles(viewType) {
+                if (viewType === 'dayGridMonth' || viewType === 'timeGridWeek') {
+                    calendarEl.style.minWidth = '100%';
+                    return;
+                }
+
+                calendarEl.style.minWidth = Math.max(560, salonOrder.length * 80 + 55) + 'px';
+            }
+
+            function posicionarEventoEnCarril(info) {
+                var salonIndex = salonOrder.indexOf(info.event.extendedProps.salon);
+                if (salonIndex < 0) return;
+
+                var count = Math.max(salonOrder.length, 1);
+                var width = 100 / count;
+                var harness = info.el.parentElement;
+
+                if (info.view.type === 'dayGridMonth') {
+                    return;
+                }
+
+                if (info.view.type === 'timeGridDay' || info.view.type === 'timeGridWeek') {
+                    harness.style.setProperty('left', (salonIndex * width) + '%', 'important');
+                    harness.style.setProperty('right', (100 - ((salonIndex + 1) * width)) + '%', 'important');
+                    harness.style.setProperty('width', 'auto', 'important');
+                }
+            }
+
+            // Devuelve el salón que corresponde a la columna donde se seleccionó.
+            function salonSeleccionadoEnCarril(info) {
+                if (selectedSalonFilter) return selectedSalonFilter;
+
+                var fecha = info.startStr.slice(0, 10);
+                var columnas = calendarEl.querySelectorAll('.fc-timegrid-col[data-date]');
+                var x = info.jsEvent && info.jsEvent.clientX;
+                if (typeof x !== 'number') return null;
+
+                for (var i = 0; i < columnas.length; i++) {
+                    var columna = columnas[i];
+                    if (columna.tagName !== 'TD' || columna.getAttribute('data-date') !== fecha) continue;
+
+                    var rect = columna.getBoundingClientRect();
+                    if (x < rect.left || x > rect.right || !rect.width) continue;
+
+                    var laneIndex = Math.min(
+                        salonOrder.length - 1,
+                        Math.floor(((x - rect.left) / rect.width) * salonOrder.length)
+                    );
+                    return salonOrder[laneIndex] || null;
+                }
+
+                return null;
+            }
+
             function compareEventsBySalon(a, b) {
                 var salonA = a.extendedProps.salon;
                 var salonB = b.extendedProps.salon;
@@ -675,7 +778,7 @@
                 initialDate: parametrosInicio.get('fecha') || undefined,
                 locale: 'es',
                 firstDay: 0,
-                height: 800, 
+                height: 800,
                 allDaySlot: false, 
                 slotEventOverlap: false,
                 eventOrder: compareEventsBySalon,
@@ -687,6 +790,7 @@
                         ? ['reserva-finalizada']
                         : [];
                 },
+                slotDuration: '00:30:00',
                 slotMinTime: '08:00:00',
                 slotMaxTime: '22:00:00', 
                 slotLabelFormat: { hour: 'numeric', minute: '2-digit', omitZeroMinute: false, meridiem: false }, 
@@ -743,22 +847,24 @@
                     contenido.appendChild(hora);
 
                     if (arg.view.type === 'timeGridWeek') {
+                        contenido.classList.add('fc-reserva-contenido-semana');
+
+                        var tituloSemana = document.createElement('div');
+                        tituloSemana.className = 'fc-reserva-titulo-semana';
+                        tituloSemana.textContent = props.salon || '';
+                        contenido.appendChild(tituloSemana);
+
                         return { domNodes: [contenido] };
                     }
 
+                    // Día: limita el bloque al resumen de la imagen (15/10/2026).
                     var detalles = [
                         { valor: arg.event.title, clase: 'fc-reserva-titulo' },
                         { valor: props.nombre_coordinador_externo, clase: 'fc-reserva-detalle' },
                         { valor: props.telefono_coordinador_externo || props.telefono_usuario, clase: 'fc-reserva-detalle' },
                         { valor: props.nombre_autoridad, clase: 'fc-reserva-detalle' },
                         { valor: props.responsable, clase: 'fc-reserva-detalle' },
-                        { valor: props.tipo_evento, clase: 'fc-reserva-detalle' },
-                        { valor: props.requerimientos_especiales, clase: 'fc-reserva-detalle' },
-                        { valor: Array.isArray(props.requerimientos) ? props.requerimientos.join(', ') : props.requerimientos, clase: 'fc-reserva-detalle' },
-                        { valor: props.aforo ? 'Aforo: ' + props.aforo : '', clase: 'fc-reserva-detalle' },
-                        { valor: props.nombre_usuario, clase: 'fc-reserva-detalle' },
-                        { valor: props.registrado_por, clase: 'fc-reserva-detalle' },
-                        { valor: props.coordinador_interno, clase: 'fc-reserva-detalle' }
+                        { valor: props.nombre_usuario, clase: 'fc-reserva-detalle' }
                     ];
 
                     detalles.forEach(function(detalle) {
@@ -773,6 +879,8 @@
                 },
 
                 eventDidMount: function(info) {
+                    posicionarEventoEnCarril(info);
+
                     var props = info.event.extendedProps;
                     var detalles = [
                         info.event.title,
@@ -802,6 +910,11 @@
                     var modal = document.getElementById('booking-modal');
                     document.getElementById('modal-start').value = info.startStr.slice(0, 19).replace('T', ' ');
                     document.getElementById('modal-end').value = info.endStr.slice(0, 19).replace('T', ' ');
+                    var salon = salonSeleccionadoEnCarril(info);
+                    var salonSelect = modal.querySelector('select[name="salon"]');
+                    if (salon && salonSelect && Array.from(salonSelect.options).some(function(option) { return option.value === salon; })) {
+                        salonSelect.value = salon;
+                    }
                     modal.style.display = 'flex';
                 },
 
@@ -848,6 +961,8 @@
                     };
                 },
                 datesSet: function(info) {
+                    ajustarAnchoCarriles(info.view.type);
+
                     var titleEl = document.getElementById('calendar-title');
                     if (info.view.type === 'timeGridWeek') {
                         var weekNumber = getWeekNumber(info.view.currentStart);
