@@ -32,6 +32,26 @@
         .fc-timegrid-slot-label-cushion { font-size: 0.8rem; color: #475b75; }
         .fc-reserva-contenido { width: 100%; overflow: hidden; white-space: normal; overflow-wrap: anywhere; line-height: 1.12; }
         .fc-reserva-hora { margin-bottom: 3px; font-weight: 800; }
+        .fc-timeGridDay-view .fc-reserva-hora {
+            display: block;
+            margin-bottom: 3px;
+            font-weight: 1000 !important;
+            -webkit-text-stroke: 0.35px currentColor;
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+        .fc-timeGridDay-view .fc-timegrid-event,
+        .fc-timeGridDay-view .fc-timegrid-event .fc-event-main { overflow: hidden !important; }
+        .fc-timeGridDay-view .fc-reserva-contenido {
+            box-sizing: border-box;
+            max-width: 100%;
+            font-size: calc(1em - 2pt);
+            overflow: hidden;
+        }
+        .fc-timeGridDay-view .fc-reserva-titulo,
+        .fc-timeGridDay-view .fc-reserva-detalle {
+            font-weight: 400 !important;
+        }
         .fc-reserva-titulo { font-weight: 600; }
         .fc-reserva-detalle { font-size: 0.92em; }
         
@@ -667,6 +687,32 @@
                 }
             }
 
+            // Devuelve el salón que corresponde a la columna donde se seleccionó.
+            function salonSeleccionadoEnCarril(info) {
+                if (selectedSalonFilter) return selectedSalonFilter;
+
+                var fecha = info.startStr.slice(0, 10);
+                var columnas = calendarEl.querySelectorAll('.fc-timegrid-col[data-date]');
+                var x = info.jsEvent && info.jsEvent.clientX;
+                if (typeof x !== 'number') return null;
+
+                for (var i = 0; i < columnas.length; i++) {
+                    var columna = columnas[i];
+                    if (columna.tagName !== 'TD' || columna.getAttribute('data-date') !== fecha) continue;
+
+                    var rect = columna.getBoundingClientRect();
+                    if (x < rect.left || x > rect.right || !rect.width) continue;
+
+                    var laneIndex = Math.min(
+                        salonOrder.length - 1,
+                        Math.floor(((x - rect.left) / rect.width) * salonOrder.length)
+                    );
+                    return salonOrder[laneIndex] || null;
+                }
+
+                return null;
+            }
+
             function compareEventsBySalon(a, b) {
                 var salonA = a.extendedProps.salon;
                 var salonB = b.extendedProps.salon;
@@ -864,6 +910,11 @@
                     var modal = document.getElementById('booking-modal');
                     document.getElementById('modal-start').value = info.startStr.slice(0, 19).replace('T', ' ');
                     document.getElementById('modal-end').value = info.endStr.slice(0, 19).replace('T', ' ');
+                    var salon = salonSeleccionadoEnCarril(info);
+                    var salonSelect = modal.querySelector('select[name="salon"]');
+                    if (salon && salonSelect && Array.from(salonSelect.options).some(function(option) { return option.value === salon; })) {
+                        salonSelect.value = salon;
+                    }
                     modal.style.display = 'flex';
                 },
 
