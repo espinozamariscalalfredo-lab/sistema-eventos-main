@@ -2,7 +2,6 @@
 <x-app-layout>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Usamos la versión core normal de FullCalendar -->
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
     <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales/es.global.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -15,139 +14,38 @@
         
         .fc .fc-day-today { background-color: #fafafa !important; }
         .fc-dayGridMonth-view .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 26px;
-            height: 26px;
-            margin: 3px;
-            padding: 0 6px;
-            border-radius: 9999px;
-            background-color: #2563eb;
-            color: #fff !important;
-            font-weight: 700;
+            display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; margin: 3px; padding: 0 6px; border-radius: 9999px; background-color: #2563eb; color: #fff !important; font-weight: 700;
         }
         
         .fc-timegrid-axis-cushion { display: none !important; }
         .fc-timegrid-slot-label-cushion { font-size: 0.8rem; color: #475b75; }
         .fc-reserva-contenido { width: 100%; overflow: hidden; white-space: normal; overflow-wrap: anywhere; line-height: 1.12; }
         .fc-reserva-hora { margin-bottom: 3px; font-weight: 800; }
-        .fc-timeGridDay-view .fc-reserva-hora {
-            display: block;
-            margin-bottom: 3px;
-            font-weight: 1000 !important;
-            -webkit-text-stroke: 0.35px currentColor;
-            white-space: normal;
-            overflow-wrap: anywhere;
-        }
-        .fc-timeGridDay-view .fc-timegrid-event,
-        .fc-timeGridDay-view .fc-timegrid-event .fc-event-main { overflow: hidden !important; }
-        .fc-timeGridDay-view .fc-reserva-contenido {
-            box-sizing: border-box;
-            max-width: 100%;
-            height: 100%;
-            font-size: calc(1em - 2pt);
-            overflow-x: hidden;
-            overflow-y: auto;
-            scrollbar-width: none;
-            overscroll-behavior: contain;
-        }
+        .fc-timeGridDay-view .fc-reserva-hora { display: block; margin-bottom: 3px; font-weight: 1000 !important; -webkit-text-stroke: 0.35px currentColor; white-space: normal; overflow-wrap: anywhere; }
+        .fc-timeGridDay-view .fc-timegrid-event, .fc-timeGridDay-view .fc-timegrid-event .fc-event-main { overflow: hidden !important; }
+        .fc-timeGridDay-view .fc-reserva-contenido { box-sizing: border-box; max-width: 100%; height: 100%; font-size: calc(1em - 2pt); overflow-x: hidden; overflow-y: auto; scrollbar-width: none; overscroll-behavior: contain; }
         .fc-timeGridDay-view .fc-reserva-contenido::-webkit-scrollbar { display: none; }
-        .fc-timeGridDay-view .fc-reserva-titulo,
-        .fc-timeGridDay-view .fc-reserva-detalle {
-            font-weight: 400 !important;
-        }
+        .fc-timeGridDay-view .fc-reserva-titulo, .fc-timeGridDay-view .fc-reserva-detalle { font-weight: 400 !important; }
         .fc-reserva-titulo { font-weight: 600; }
         .fc-reserva-detalle { font-size: 0.92em; }
         
-        .fc-dayGridMonth-view .fc-event {
-            border-radius: 99px !important; 
-            border: none !important;
-            margin-bottom: 2px !important; 
-            overflow: hidden;
-            box-shadow: none !important;
-        }
-        
-        .fc-dayGridMonth-view .fc-event-main {
-            padding: 2px 6px !important; 
-            display: flex;
-            align-items: center;
-        }
+        .fc-dayGridMonth-view .fc-event { border-radius: 99px !important; border: none !important; margin-bottom: 2px !important; overflow: hidden; box-shadow: none !important; }
+        .fc-dayGridMonth-view .fc-event-main { padding: 2px 6px !important; display: flex; align-items: center; }
+        .fc-dayGridMonth-view .fc-reserva-contenido { display: flex; flex-direction: row; align-items: center; width: 100%; gap: 4px; line-height: 1; }
+        .fc-dayGridMonth-view .fc-reserva-hora { font-weight: 800; font-size: 10px; margin-bottom: 0 !important; color: white; white-space: nowrap; }
+        .fc-dayGridMonth-view .fc-reserva-titulo { font-weight: 500; font-size: 10px; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .fc-dayGridMonth-view .fc-reserva-contenido {
-            display: flex;
-            flex-direction: row; 
-            align-items: center;
-            width: 100%;
-            gap: 4px; 
-            line-height: 1;
-        }
-
-        .fc-dayGridMonth-view .fc-reserva-hora {
-            font-weight: 800;
-            font-size: 10px; 
-            margin-bottom: 0 !important; 
-            color: white;
-            white-space: nowrap;
-        }
-
-        .fc-dayGridMonth-view .fc-reserva-titulo {
-            font-weight: 500;
-            font-size: 10px;
-            color: white;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis; 
-        }
-
-        .fc-reserva-indicador-cancelado {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            flex: 0 0 6px;
-            border-radius: 50%;
-            background: #dc2626;
-            box-shadow: 0 0 0 1px rgba(255, 255, 255, .9);
-            vertical-align: middle;
-        }
-
-        .fc-dayGridMonth-view .fc-reserva-titulo-cancelado {
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            min-width: 0;
-        }
-        
-        .fc-dayGridMonth-view .fc-daygrid-day-frame {
-            height: 140px !important; 
-            display: flex;
-            flex-direction: column;
-        }
-
-        .fc-dayGridMonth-view .fc-daygrid-day-events {
-            flex-grow: 1;
-            max-height: 105px !important; 
-            overflow-y: auto !important; 
-            margin-bottom: 2px;
-        }
-
-        .fc-dayGridMonth-view .fc-daygrid-day-events::-webkit-scrollbar {
-            width: 4px; 
-        }
-        .fc-dayGridMonth-view .fc-daygrid-day-events::-webkit-scrollbar-track {
-            background: transparent; 
-        }
-        .fc-dayGridMonth-view .fc-daygrid-day-events::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
-            border-radius: 10px;
-        }
-        .fc-dayGridMonth-view .fc-daygrid-day-events::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
-        }
+        .fc-reserva-indicador-cancelado { display: inline-block; width: 6px; height: 6px; flex: 0 0 6px; border-radius: 50%; background: #dc2626; box-shadow: 0 0 0 1px rgba(255, 255, 255, .9); vertical-align: middle; }
+        .fc-dayGridMonth-view .fc-reserva-titulo-cancelado { display: inline-flex; align-items: center; gap: 3px; min-width: 0; }
+        .fc-dayGridMonth-view .fc-daygrid-day-frame { height: 140px !important; display: flex; flex-direction: column; }
+        .fc-dayGridMonth-view .fc-daygrid-day-events { flex-grow: 1; max-height: 105px !important; overflow-y: auto !important; margin-bottom: 2px; }
+        .fc-dayGridMonth-view .fc-daygrid-day-events::-webkit-scrollbar { width: 4px; }
+        .fc-dayGridMonth-view .fc-daygrid-day-events::-webkit-scrollbar-track { background: transparent; }
+        .fc-dayGridMonth-view .fc-daygrid-day-events::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .fc-dayGridMonth-view .fc-daygrid-day-events::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         .fc .fc-event.reserva-finalizada { opacity: 0.55; }
 
-        /* Carriles fijos por salón: 15/10/2026. */
-        .salones-calendar-scroll { overflow-x: auto; }
+        .salones-calendar-scroll { overflow-x: auto; min-height: 600px; }
 
         .mini-cal { width: 100%; text-align: center; font-size: 13px; border-collapse: separate; border-spacing: 2px; }
         .mini-cal th { color: #9ca3af; font-weight: normal; font-size: 12px; padding-bottom: 4px; }
@@ -163,83 +61,31 @@
         .salon-filter:not(.active) .salon-filter-check { display: none; }
         .salon-filter.active { box-shadow: 0 0 0 2px white, 0 0 0 4px #334155; }
         
-        .mc-today-real {
-            border: 2px solid #2563eb !important;
-            color: #2563eb !important;
-            font-weight: bold;
-        }
-
-        .mc-row-selected td {
-            background-color: #e2e8f0 !important;
-        }
-        .mc-row-selected td.mc-today-real {
-            background-color: #ffffff !important;
-            border: 2px solid #2563eb !important;
-        }
-        .mc-row-selected td.mc-has-event {
-            background-color: #f59e0b !important;
-        }
+        .mc-today-real { border: 2px solid #2563eb !important; color: #2563eb !important; font-weight: bold; }
+        .mc-row-selected td { background-color: #e2e8f0 !important; }
+        .mc-row-selected td.mc-today-real { background-color: #ffffff !important; border: 2px solid #2563eb !important; }
+        .mc-row-selected td.mc-has-event { background-color: #f59e0b !important; }
 
         @media (max-width: 900px) {
             .salones-cal-layout { flex-direction: column !important; gap: 16px !important; }
             .salones-cal-main, .salones-cal-side { width: 100% !important; min-width: 0 !important; }
             .salones-cal-side { padding: 12px !important; }
         }
-        @media (max-width: 640px) {
-            .salones-page-header, .salones-cal-toolbar { flex-wrap: wrap; gap: 12px; }
-            .salones-page-header { align-items: center !important; }
-            .salones-cal-toolbar { justify-content: flex-start !important; }
-            .salones-calendar-scroll { overflow-x: auto; }
-            .salones-calendar-scroll #calendar { min-width: 560px; }
-            .edit-modal-panel { max-height: calc(100dvh - 24px) !important; }
-        }
         .edit-modal-drag-handle { cursor: move; touch-action: none; user-select: none; }
-        .fc-reserva-contenido-semana {
-            position: relative;
-            height: 100%;
-            overflow: visible;
-            text-align: center;
-        }
-        .fc-reserva-contenido-semana .fc-reserva-indicador-cancelado {
-            position: absolute;
-            top: 1px;
-            left: 1px;
-            z-index: 2;
-        }
-        .fc-reserva-contenido-semana .fc-reserva-hora {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            white-space: nowrap;
-            overflow: visible;
-            text-align: center;
-            font-size: 10px;
-            line-height: 1.1;
-        }
-        .fc-reserva-minutos-semana {
-            font-size: 9px;
-        }
-        .fc-reserva-periodo-semana {
-            font-size: 8px;
-            text-transform: uppercase;
-        }
-        .fc-reserva-estado-cancelado {
-            display: inline-flex;
-            align-items: center;
-            flex: 0 0 auto;
-            padding: 2px 7px;
-            border: 1px solid #fecaca;
-            border-radius: 999px;
-            background: #dc2626;
-            color: #fff;
-            font-size: 9px;
-            font-weight: 700;
-            line-height: 1.2;
-            vertical-align: middle;
-            box-shadow: 0 1px 2px rgba(127,29,29,.25);
-        }
+        .fc-reserva-contenido-semana { position: relative; height: 100%; overflow: visible; text-align: center; }
+        .fc-reserva-contenido-semana .fc-reserva-indicador-cancelado { position: absolute; top: 1px; left: 1px; z-index: 2; }
+        .fc-reserva-contenido-semana .fc-reserva-hora { display: flex; flex-direction: column; align-items: center; white-space: nowrap; overflow: visible; text-align: center; font-size: 10px; line-height: 1.1; }
+        .fc-reserva-minutos-semana { font-size: 9px; }
+        .fc-reserva-periodo-semana { font-size: 8px; text-transform: uppercase; }
+        .fc-reserva-estado-cancelado { display: inline-flex; align-items: center; flex: 0 0 auto; padding: 2px 7px; border: 1px solid #fecaca; border-radius: 999px; background: #dc2626; color: #fff; font-size: 9px; font-weight: 700; line-height: 1.2; vertical-align: middle; box-shadow: 0 1px 2px rgba(127,29,29,.25); }
         .fc-timeGridDay-view .fc-reserva-titulo { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
         .fc-timegrid-event, .fc-timegrid-event .fc-event-main { overflow: visible !important; }
+
+        /* Estilos para la tabla personalizada "Disponible" */
+        .tabla-disponible th { padding: 12px 8px; font-weight: bold; color: #475b75; font-size: 12px; text-align: center; line-height: 1.2; white-space: normal; max-width: 100px; }
+        .tabla-disponible td { padding: 12px 8px; text-align: center; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #64748b; }
+        .tabla-disponible tr:hover { background-color: #f8fafc; }
+        .celda-vacia:hover { background-color: #e2e8f0; border-radius: 4px; cursor: pointer; color: #3b82f6; font-weight: bold; }
     </style>
 
     <div class="min-h-screen bg-white py-6 px-4 sm:px-8">
@@ -263,7 +109,6 @@
 
             <div class="salones-cal-layout" style="display: flex; gap: 30px;">
                 
-                <!-- CALENDARIO GRANDE -->
                 <div class="salones-cal-main" style="flex: 1; min-width: 0;">
                     <div class="salones-cal-toolbar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                         
@@ -277,10 +122,11 @@
                                 <a href="#" class="view-option" data-view="dayGridMonth" style="display: block; padding: 6px 16px; text-decoration: none; color: inherit;">Mes</a>
                                 <a href="#" class="view-option" data-view="timeGridWeek" style="display: block; padding: 6px 16px; text-decoration: none; color: #1f2937; font-weight: bold; background-color: #f9fafb;">Semana</a>
                                 <a href="#" class="view-option" data-view="timeGridDay" style="display: block; padding: 6px 16px; text-decoration: none; color: inherit;">Día</a>
+                                <a href="#" class="view-option" data-view="disponible" style="display: block; padding: 6px 16px; text-decoration: none; color: inherit; border-top: 1px solid #e5e7eb;">Disponible</a>
                             </div>
                         </div>
 
-                        <div style="display: flex; align-items: center; gap: 24px;">
+                        <div style="display: flex; align-items: center; gap: 24px;" id="toolbar-botones-navegacion">
                             <button id="btn-hoy" style="background: #94a3b8; color: white; padding: 4px 12px; border-radius: 4px; font-size: 14px; border: none; cursor: pointer;">
                                 Hoy
                             </button>
@@ -292,7 +138,50 @@
                         </div>
                     </div>
 
-                    <div class="salones-calendar-scroll"><div id="calendar" style="background: white;"></div></div>
+                    <!-- CONTENEDOR DEL CALENDARIO NORMAL -->
+                    <div class="salones-calendar-scroll" id="calendar-container">
+                        <div id="calendar" style="background: white;"></div>
+                    </div>
+
+                    <!-- CONTENEDOR DE LA NUEVA TABLA "DISPONIBLE" CON EL BUSCADOR (Oculta por defecto) -->
+                    <div id="vista-disponible-container" style="display: none; background: white; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                        <div style="padding: 16px 24px; border-bottom: 1px solid #e2e8f0;">
+                            <h2 style="font-size: 18px; font-weight: bold; color: #334155; margin: 0;" id="titulo-disponible">Disponibilidad para salones</h2>
+                        </div>
+                        <div style="overflow-x: auto; min-height: 300px;">
+                            <table class="tabla-disponible" style="width: 100%; border-collapse: collapse;">
+                                <thead style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                                    <tr id="cabecera-disponible">
+                                        <!-- Generado por JS -->
+                                    </tr>
+                                </thead>
+                                <tbody id="cuerpo-disponible">
+                                    <!-- Generado por JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- FILTRO BUSCADOR DE TIEMPO LIBRE -->
+                        <div style="padding: 16px 24px; border-top: 1px solid #e2e8f0; font-size: 13px; color: #64748b;">
+                            Haga clic en un espacio libre para crear una nueva reserva.
+                        </div>
+                        <div style="padding: 16px 24px; display: flex; align-items: center; gap: 12px; font-size: 14px; color: #475b75; flex-wrap: wrap; background: #f8fafc; border-top: 1px solid #e2e8f0;">
+                            <span>Encontrar espacio disponible después de</span>
+                            <input type="datetime-local" id="filtro-gap-fecha" style="border: 1px solid #d1d5db; border-radius: 4px; padding: 4px 8px; outline: none; font-size: 13px; font-family: inherit;">
+                            <span>de</span>
+                            <input type="number" id="filtro-gap-minutos" value="60" min="15" style="border: 1px solid #d1d5db; border-radius: 4px; padding: 4px 8px; width: 70px; outline: none; font-size: 13px;">
+                            <span>minutos para</span>
+                            <select id="filtro-gap-salon" style="border: 1px solid #d1d5db; border-radius: 4px; padding: 4px 8px; outline: none; font-size: 13px;">
+                                <option value="any">cualquier recurso</option>
+                                @foreach($salones as $salon)
+                                    <option value="{{ $salon->nombre }}">{{ $salon->nombre }}</option>
+                                @endforeach
+                            </select>
+                            <button type="button" id="btn-buscar-gap" style="background: #2563eb; color: white; border: none; border-radius: 4px; padding: 6px 16px; font-weight: bold; font-size: 13px; cursor: pointer;">Buscar</button>
+                            <a href="#" id="btn-vaciar-gap" style="color: #3b82f6; text-decoration: underline; font-size: 12px;">Vaciar búsqueda</a>
+                        </div>
+                    </div>
+
                 </div>
 
                 <!-- MINI CALENDARIO DINÁMICO -->
@@ -327,12 +216,11 @@
                             </button>
                         @endforeach
                     </div>
-
                 </div>
             </div>
         </div>
         
-        <!-- MODAL FLOTANTE UNIFICADO "NUEVA RESERVA" (Movible) -->
+        <!-- MODAL FLOTANTE UNIFICADO "NUEVA RESERVA" -->
         <div id="booking-modal" style="display: none; position: fixed; inset: 0; background: transparent; z-index: 100;">
             <div id="booking-modal-panel" class="edit-modal-panel" style="position: fixed; top: 10vh; left: 5vw; width: min(650px, calc(100vw - 32px)); max-height: 86vh; display: flex; flex-direction: column; background: rgba(255,255,255,0.94); backdrop-filter: blur(14px); border: 1px solid rgba(203,213,225,0.8); border-radius: 10px; box-shadow: 0 18px 50px rgba(15,23,42,0.18); font-family: sans-serif;">
                 
@@ -343,7 +231,6 @@
 
                 <form id="booking-form" style="display: flex; flex-direction: column; overflow: hidden; flex-grow: 1;">
                     @csrf
-                    
                     <div style="padding: 24px; overflow-y: auto; flex-grow: 1;">
                         
                         <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
@@ -442,14 +329,14 @@
                         </div>
 
                         <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
-                            <label style="width: 160px; font-size: 13px; color: #4b5563;">Aforo *<br><small style="color:#9ca3af; font-weight:normal;">Cantidad de personas en el evento</small></label>
+                            <label style="width: 160px; font-size: 13px; color: #4b5563;">Aforo *<br><small style="color:#9ca3af; font-weight:normal;">Cantidad de personas</small></label>
                             <div style="flex: 1;">
                                 <input type="number" name="aforo" placeholder="Ej: 77" min="1" style="width: 100%; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; padding: 6px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
                             </div>
                         </div>
 
                         <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
-                            <label style="width: 160px; font-size: 13px; color: #4b5563;">Tipo de ingreso *<br><small style="color:#9ca3af; font-weight:normal;">Como ingresaran al edificio</small></label>
+                            <label style="width: 160px; font-size: 13px; color: #4b5563;">Tipo de ingreso *</label>
                             <div style="flex: 1;">
                                 <select name="tipo_ingreso" style="width: 100%; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; padding: 6px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
                                     <option value="Bajo lista">Bajo lista</option>
@@ -460,35 +347,35 @@
                         </div>
 
                         <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
-                            <label style="width: 160px; font-size: 13px; color: #4b5563;">Nombre del coordinador externo *<br><small style="color:#9ca3af; font-weight:normal;">Nombre completo</small></label>
+                            <label style="width: 160px; font-size: 13px; color: #4b5563;">Nombre Coord. externo *</label>
                             <div style="flex: 1;">
                                 <input type="text" name="nombre_coordinador_externo" placeholder="" style="width: 100%; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; padding: 6px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
                             </div>
                         </div>
 
                         <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
-                            <label style="width: 160px; font-size: 13px; color: #4b5563;">Celular del coordinador externo *</label>
+                            <label style="width: 160px; font-size: 13px; color: #4b5563;">Celular Coord. externo *</label>
                             <div style="flex: 1;">
                                 <input type="tel" name="telefono_coordinador_externo" placeholder="" maxlength="15" oninput="this.value = this.value.replace(/[^0-9]/g, '')" style="width: 100%; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; padding: 6px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
                             </div>
                         </div>
 
                         <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
-                            <label style="width: 160px; font-size: 13px; color: #4b5563;">Requerimiento especial<br><small style="color:#9ca3af; font-weight:normal;">Personal o característica</small></label>
+                            <label style="width: 160px; font-size: 13px; color: #4b5563;">Requerimiento especial</label>
                             <div style="flex: 1;">
                                 <input type="text" name="requerimientos_especiales" placeholder="" style="width: 100%; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; padding: 6px 12px; font-size: 13px; color: #1e293b; outline: none;">
                             </div>
                         </div>
 
                         <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
-                            <label style="width: 160px; font-size: 13px; color: #4b5563;">Nombre de quien registra *</label>
+                            <label style="width: 160px; font-size: 13px; color: #4b5563;">Nombre quien registra *</label>
                             <div style="flex: 1;">
                                 <input type="text" name="registrado_por" value="{{ Auth::user()->nombre }}" style="width: 100%; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; padding: 6px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
                             </div>
                         </div>
 
                         <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
-                            <label style="width: 160px; font-size: 13px; color: #4b5563;">Nombre coordinador interno</label>
+                            <label style="width: 160px; font-size: 13px; color: #4b5563;">Coordinador interno</label>
                             <div style="flex: 1;">
                                 <input type="text" name="coordinador_interno" placeholder="" style="width: 100%; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; padding: 6px 12px; font-size: 13px; color: #1e293b; outline: none;">
                             </div>
@@ -680,7 +567,6 @@
                         </div>
                     </div>
 
-                    <!-- Footer y Botones de Acción -->
                     <div style="padding: 16px 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: rgba(248,250,252,0.92); backdrop-filter: blur(14px);">
                         <div>
                             <span id="edit-footer-text" style="font-size: 11px; color: #9ca3af;"></span>
@@ -704,6 +590,7 @@
         </div>
     </div>
 
+    <!-- SCRIPTS -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
@@ -714,13 +601,18 @@
             var parametrosInicio = new URLSearchParams(window.location.search);
             var reservaParaEditar = parametrosInicio.get('editar');
             var salonOrder = Object.keys(salonColors);
+            
+            // VARIABLES GLOBALES PARA EL BUSCADOR DE ESPACIOS (Gaps)
+            var gapFilterActive = false;
+            var gapStartDate = null;
+            var gapDurationMins = 60;
+            var gapSalon = 'any';
 
             function ajustarAnchoCarriles(viewType) {
                 if (viewType === 'dayGridMonth' || viewType === 'timeGridWeek') {
                     calendarEl.style.minWidth = '100%';
                     return;
                 }
-
                 calendarEl.style.minWidth = Math.max(560, salonOrder.length * 80 + 55) + 'px';
             }
 
@@ -732,9 +624,7 @@
                 var width = 100 / count;
                 var harness = info.el.parentElement;
 
-                if (info.view.type === 'dayGridMonth') {
-                    return;
-                }
+                if (info.view.type === 'dayGridMonth') return;
 
                 if (info.view.type === 'timeGridDay' || info.view.type === 'timeGridWeek') {
                     harness.style.setProperty('left', (salonIndex * width) + '%', 'important');
@@ -743,7 +633,6 @@
                 }
             }
 
-            // Reaplica posiciones después del cambio de vista y del recálculo de ancho.
             function reaplicarCarrilesEnVista(viewType) {
                 if (viewType !== 'timeGridDay' && viewType !== 'timeGridWeek') return;
 
@@ -759,7 +648,6 @@
                 });
             }
 
-            // Devuelve el salón que corresponde a la columna donde se seleccionó.
             function salonSeleccionadoEnCarril(info) {
                 if (selectedSalonFilter) return selectedSalonFilter;
 
@@ -781,7 +669,6 @@
                     );
                     return salonOrder[laneIndex] || null;
                 }
-
                 return null;
             }
 
@@ -795,6 +682,228 @@
                 if (positionB === -1) positionB = salonOrder.length;
 
                 return positionA - positionB || a.start - b.start || a.title.localeCompare(b.title);
+            }
+
+            // ======= FUNCIONALIDAD DE LA VISTA PERSONALIZADA "DISPONIBLE" =======
+            function renderTablaDisponible() {
+                var tbody = document.getElementById('cuerpo-disponible');
+                var thead = document.getElementById('cabecera-disponible');
+                var tituloVista = document.querySelector('#titulo-disponible');
+                
+                // 1. DETERMINAR QUÉ SALONES MOSTRAR (Todos o solo el filtrado en la leyenda)
+                // Si el Buscador de Huecos está activo y tiene un salón específico, forzamos ese salón
+                var currentVisualFilter = (gapFilterActive && gapSalon !== 'any') ? gapSalon : selectedSalonFilter;
+                var salonesAMostrar = currentVisualFilter ? [currentVisualFilter] : salonOrder;
+
+                // Actualizar el título dinámicamente
+                if (tituloVista) {
+                    let tituloBase = currentVisualFilter ? `Disponibilidad para ${currentVisualFilter}` : 'Disponibilidad para salones';
+                    if (gapFilterActive && gapStartDate) {
+                        let dateString = `${gapStartDate.getFullYear()}-${String(gapStartDate.getMonth()+1).padStart(2,'0')}-${String(gapStartDate.getDate()).padStart(2,'0')}`;
+                        tituloVista.innerText = `${tituloBase} después de ${dateString}`;
+                    } else {
+                        tituloVista.innerText = tituloBase;
+                    }
+                }
+
+                // 2. CONSTRUIR CABECERAS
+                tbody.innerHTML = '';
+                thead.innerHTML = `
+                    <th style="padding: 12px 16px; font-weight: 600; color: #475b75; width: 80px;">De</th>
+                    <th style="padding: 12px 8px; width: 20px;"></th>
+                    <th style="padding: 12px 16px; font-weight: 600; color: #475b75; width: 80px;">Hasta</th>
+                    <th style="padding: 12px 16px; width: 40px;"></th>
+                `;
+
+                salonesAMostrar.forEach(salon => {
+                    thead.innerHTML += `<th style="padding: 12px 16px; font-weight: 600; color: #475b75; text-align: center; max-width: 120px; white-space: normal; line-height: 1.2;">${salon}</th>`;
+                });
+
+                // Pedimos TODAS las reservas a la API para hacer los cálculos
+                fetch('/api/salones/reservas', { headers: { 'Accept': 'application/json' } })
+                    .then(response => response.json())
+                    .then(allEvents => {
+                        let sortedKeys = [];
+                        let timeBlocks = {};
+                        
+                        // Si el Buscador de Huecos NO está activo, generamos la tabla normal (basada en reservas de la semana)
+                        if (!gapFilterActive) {
+                            let viewStart = calendar.view.activeStart;
+                            let viewEnd = calendar.view.activeEnd;
+                            
+                            let eventosEnEstaSemana = allEvents.filter(ev => {
+                                let evStart = new Date(ev.start);
+                                return (evStart >= viewStart && evStart < viewEnd);
+                            });
+
+                            eventosEnEstaSemana.forEach(ev => {
+                                let start = new Date(ev.start);
+                                let end = ev.end ? new Date(ev.end) : new Date(ev.start);
+                                
+                                let dayNames = ['do', 'lu', 'ma', 'mi', 'ju', 'vi', 'sa'];
+                                let startDay = dayNames[start.getDay()];
+                                let startMonth = String(start.getMonth() + 1).padStart(2, '0');
+                                let startDateStr = String(start.getDate()).padStart(2, '0');
+                                let startHour = start.getHours(); // Formato 8:00
+                                let startMin = String(start.getMinutes()).padStart(2, '0');
+                                
+                                let endHour = end.getHours();
+                                let endMin = String(end.getMinutes()).padStart(2, '0');
+
+                                let key = `${start.getTime()}-${end.getTime()}`;
+                                let displayStart = `${startDay} ${startMonth}-${startDateStr} ${startHour}:${startMin}`;
+                                let displayEnd = `${endHour}:${endMin}`;
+
+                                if (!timeBlocks[key]) {
+                                    timeBlocks[key] = { startObj: start, endObj: end, displayStart: displayStart, displayEnd: displayEnd, salonesOcupados: {} };
+                                }
+                                timeBlocks[key].salonesOcupados[ev.salon] = ev;
+                            });
+
+                            sortedKeys = Object.keys(timeBlocks).sort((a, b) => timeBlocks[a].startObj.getTime() - timeBlocks[b].startObj.getTime());
+                            
+                        } 
+                        // MODO BUSCADOR: Calculamos los ESPACIOS LIBRES desde la fecha indicada (Buscador Inteligente)
+                        else {
+                            let targetDate = new Date(gapStartDate);
+                            targetDate.setSeconds(0, 0);
+                            
+                            // Buscamos hasta 14 días adelante
+                            let endDateScope = new Date(targetDate);
+                            endDateScope.setDate(endDateScope.getDate() + 14);
+
+                            let salonesAChecar = gapSalon === 'any' ? salonOrder : [gapSalon];
+                            let gapsEncontrados = [];
+
+                            for (let d = new Date(targetDate); d < endDateScope; d.setDate(d.getDate() + 1)) {
+                                // Horario de oficina: de 08:00 a 21:00
+                                let dayStart = new Date(d); dayStart.setHours(8, 0, 0, 0);
+                                let dayEnd = new Date(d); dayEnd.setHours(21, 0, 0, 0);
+
+                                if (d.toDateString() === targetDate.toDateString()) {
+                                    if (targetDate > dayStart) dayStart = new Date(targetDate);
+                                }
+                                if (dayStart >= dayEnd) continue;
+
+                                salonesAChecar.forEach(salon => {
+                                    let evsDelDia = allEvents.filter(e => {
+                                        let eStart = new Date(e.start);
+                                        let eEnd = new Date(e.end || e.start);
+                                        return e.salon === salon && eEnd > dayStart && eStart < dayEnd;
+                                    });
+                                    evsDelDia.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+                                    let pointer = new Date(dayStart);
+                                    evsDelDia.forEach(ev => {
+                                        let evStart = new Date(ev.start);
+                                        let evEnd = new Date(ev.end || ev.start);
+
+                                        if (evStart > pointer) {
+                                            let diffMins = (evStart - pointer) / 60000;
+                                            if (diffMins >= gapDurationMins) {
+                                                gapsEncontrados.push({ salon: salon, start: new Date(pointer), end: new Date(evStart) });
+                                            }
+                                        }
+                                        if (evEnd > pointer) {
+                                            pointer = new Date(evEnd);
+                                        }
+                                    });
+
+                                    // Chequear espacio desde el último evento del día hasta las 21:00
+                                    if (dayEnd > pointer) {
+                                        let diffMins = (dayEnd - pointer) / 60000;
+                                        if (diffMins >= gapDurationMins) {
+                                            gapsEncontrados.push({ salon: salon, start: new Date(pointer), end: new Date(dayEnd) });
+                                        }
+                                    }
+                                });
+                            }
+
+                            // Agrupar los gaps por franja horaria para generar las filas de la tabla
+                            gapsEncontrados.forEach(gap => {
+                                let dayNames = ['do', 'lu', 'ma', 'mi', 'ju', 'vi', 'sa'];
+                                let startDay = dayNames[gap.start.getDay()];
+                                let startMonth = String(gap.start.getMonth() + 1).padStart(2, '0');
+                                let startDateStr = String(gap.start.getDate()).padStart(2, '0');
+                                let startHour = gap.start.getHours(); // 8:00 sin cero inicial
+                                let startMin = String(gap.start.getMinutes()).padStart(2, '0');
+                                
+                                let endHour = gap.end.getHours();
+                                let endMin = String(gap.end.getMinutes()).padStart(2, '0');
+
+                                let key = `${gap.start.getTime()}-${gap.end.getTime()}`;
+                                let displayStart = `${startDay} ${startMonth}-${startDateStr} ${startHour}:${startMin}`;
+                                let displayEnd = `${endHour}:${endMin}`;
+
+                                if (!timeBlocks[key]) {
+                                    timeBlocks[key] = { startObj: gap.start, endObj: gap.end, displayStart: displayStart, displayEnd: displayEnd, salonesOcupados: {} };
+                                    // En modo gap, asumimos todo ocupado (.) y luego "desocupamos" (+) el salón libre encontrado
+                                    salonesAMostrar.forEach(s => timeBlocks[key].salonesOcupados[s] = true);
+                                }
+                                // Como encontramos este hueco libre, lo borramos de ocupados
+                                delete timeBlocks[key].salonesOcupados[gap.salon];
+                            });
+                            
+                            sortedKeys = Object.keys(timeBlocks).sort((a, b) => timeBlocks[a].startObj.getTime() - timeBlocks[b].startObj.getTime());
+                        }
+
+                        // VALIDAR SI HAY RESULTADOS
+                        if (sortedKeys.length === 0) {
+                            let msg = gapFilterActive ? `No se encontraron espacios de ${gapDurationMins} minutos disponibles después de la fecha indicada.` : `No hay actividad programada para mostrar en esta vista.`;
+                            tbody.innerHTML = `<tr><td colspan="${4 + salonesAMostrar.length}" style="padding: 32px; text-align: center; color: #9ca3af;">${msg}</td></tr>`;
+                            return;
+                        }
+
+                        // 4. GENERAR FILAS Y CELDAS
+                        sortedKeys.forEach(key => {
+                            let block = timeBlocks[key];
+                            let tr = document.createElement('tr');
+
+                            tr.innerHTML += `<td style="padding: 12px 16px; color: #475b75; white-space: nowrap;">${block.displayStart}</td>`;
+                            tr.innerHTML += `<td style="padding: 12px 8px; color: #94a3b8;">-</td>`;
+                            tr.innerHTML += `<td style="padding: 12px 16px; color: #475b75;">${block.displayEnd}</td>`;
+                            tr.innerHTML += `<td style="padding: 12px 16px; color: #3b82f6;"><i class="fa-solid fa-calendar-days"></i></td>`;
+
+                            salonesAMostrar.forEach(salonName => {
+                                let td = document.createElement('td');
+                                td.style.padding = '12px 16px';
+                                td.style.textAlign = 'center';
+
+                                if (block.salonesOcupados[salonName]) {
+                                    // OCUPADO (.)
+                                    td.innerText = '.';
+                                    if(!gapFilterActive) {
+                                        let ev = block.salonesOcupados[salonName];
+                                        td.title = `Ocupado: ${ev.title}`; 
+                                    }
+                                    td.style.color = '#94a3b8'; 
+                                    td.style.fontWeight = 'bold';
+                                } else {
+                                    // LIBRE (+)
+                                    let color = salonColors[salonName] || '#3b82f6';
+                                    td.innerHTML = `<span style="display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background-color:${color}; color:white; font-size:14px; cursor:pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.1);" title="Disponible - Clic para reservar">+</span>`;
+                                    
+                                    td.querySelector('span').addEventListener('click', () => {
+                                        let s = block.startObj;
+                                        let e = block.endObj;
+                                        
+                                        let startFormatted = `${s.getFullYear()}-${String(s.getMonth()+1).padStart(2,'0')}-${String(s.getDate()).padStart(2,'0')}T${String(s.getHours()).padStart(2,'0')}:${String(s.getMinutes()).padStart(2,'0')}`;
+                                        let endFormatted = `${e.getFullYear()}-${String(e.getMonth()+1).padStart(2,'0')}-${String(e.getDate()).padStart(2,'0')}T${String(e.getHours()).padStart(2,'0')}:${String(e.getMinutes()).padStart(2,'0')}`;
+                                        
+                                        document.getElementById('modal-start').value = startFormatted;
+                                        document.getElementById('modal-end').value = endFormatted;
+                                        
+                                        let salonSelect = document.querySelector('#booking-modal select[name="salon"]');
+                                        if (salonSelect) salonSelect.value = salonName;
+                                        
+                                        document.getElementById('booking-modal').style.display = 'flex';
+                                    });
+                                }
+                                tr.appendChild(td);
+                            });
+                            tbody.appendChild(tr);
+                        });
+                    });
             }
 
             function abrirEdicionReserva(evento) {
@@ -852,10 +961,7 @@
                 initialDate: parametrosInicio.get('fecha') || undefined,
                 locale: 'es',
                 firstDay: 0,
-                views: {
-                    // El mes empieza en domingo para mantener el orden DO-LU-MA-MI-JU-VI-SA (19/10/2026).
-                    dayGridMonth: { firstDay: 0 }
-                },
+                views: { dayGridMonth: { firstDay: 0 } },
                 height: 800,
                 allDaySlot: false, 
                 slotEventOverlap: false,
@@ -864,11 +970,8 @@
                 
                 eventClassNames: function(arg) {
                     var finEvento = arg.event.end || arg.event.start;
-                    return finEvento && finEvento <= new Date()
-                        ? ['reserva-finalizada']
-                        : [];
+                    return finEvento && finEvento <= new Date() ? ['reserva-finalizada'] : [];
                 },
-                slotDuration: '00:30:00',
                 slotMinTime: '08:00:00',
                 slotMaxTime: '22:00:00', 
                 slotLabelFormat: { hour: 'numeric', minute: '2-digit', omitZeroMinute: false, meridiem: false }, 
@@ -943,7 +1046,6 @@
                             indicadorSemana.title = 'Cancelado';
                             contenido.appendChild(indicadorSemana);
                         }
-                        // Semana: hora, minutos y AM/PM en líneas separadas (19/10/2026).
                         var horaInicio = arg.event.start;
                         hora.textContent = '';
                         var hora24 = horaInicio.getHours();
@@ -967,7 +1069,6 @@
                         return { domNodes: [contenido] };
                     }
 
-                    // Día: limita el bloque al resumen de la imagen (15/10/2026).
                     var detalles = [
                         { valor: arg.event.title, clase: 'fc-reserva-titulo' },
                         { valor: props.nombre_coordinador_externo, clase: 'fc-reserva-detalle' },
@@ -1036,11 +1137,15 @@
                     info.el.setAttribute('aria-label', detalles.join(', '));
                 },
 
-                eventsSet: function() {
+                eventsSet: function(info) {
                     var viewType = calendar.view.type;
+                    
+                    if (document.getElementById('vista-disponible-container').style.display === 'block') {
+                        renderTablaDisponible();
+                    }
+
                     if (viewType !== 'timeGridDay' && viewType !== 'timeGridWeek') return;
 
-                    // Espera el recálculo que ocurre al aplicar un filtro de salón.
                     requestAnimationFrame(function() {
                         calendar.updateSize();
                         requestAnimationFrame(function() {
@@ -1057,7 +1162,6 @@
                     }
 
                     var modal = document.getElementById('booking-modal');
-                    // datetime-local necesita fecha y hora separadas por T (19/10/2026).
                     document.getElementById('modal-start').value = info.startStr.slice(0, 16);
                     document.getElementById('modal-end').value = info.endStr.slice(0, 16);
                     var salon = salonSeleccionadoEnCarril(info);
@@ -1088,19 +1192,13 @@
                             ? 'display: table; margin: 4px auto; padding: 8px 16px; border-radius: 999px; background: #eff6ff; color: #2563eb; box-shadow: 0 0 0 1px #bfdbfe; text-align: center; font-size: 14px; font-weight: 600;'
                             : 'text-align: center; color: #475b75; font-size: 14px; font-weight: 400; padding: 10px 0;';
 
-                        return {
-                            html: '<div style="' + estiloFechaDia + '">'
-                                + fechaCompleta + '</div>'
-                        };
+                        return { html: '<div style="' + estiloFechaDia + '">' + fechaCompleta + '</div>' };
                     }
 
                     var dayNames = ['DO', 'LU', 'MA', 'MI', 'JU', 'VI', 'SA'];
                     var dayStr = dayNames[arg.date.getDay()];
                     if (arg.view.type === 'dayGridMonth') {
-                        return {
-                            html: '<div style="text-align: center; text-transform: uppercase; font-size: 0.8rem; color: #64748b; font-weight: 400;">'
-                                + dayStr + '</div>'
-                        };
+                        return { html: '<div style="text-align: center; text-transform: uppercase; font-size: 0.8rem; color: #64748b; font-weight: 400;">' + dayStr + '</div>' };
                     }
                     var dateNum = arg.date.getDate();
                     var hoy = new Date();
@@ -1119,7 +1217,6 @@
                 datesSet: function(info) {
                     ajustarAnchoCarriles(info.view.type);
 
-                    // FullCalendar debe terminar el cambio antes de repartir los carriles.
                     if (info.view.type === 'timeGridDay' || info.view.type === 'timeGridWeek') {
                         requestAnimationFrame(function() {
                             calendar.updateSize();
@@ -1149,9 +1246,84 @@
             calendar.render();
             window.setInterval(function() { calendar.rerenderEvents(); }, 60000);
 
+            // CONTROL DEL MENÚ DE VISTAS Y LA VISTA "DISPONIBLE"
+            var btnDropdown = document.getElementById('btn-view-dropdown');
+            var viewMenu = document.getElementById('view-menu');
+            var currentViewText = document.getElementById('current-view-text');
+            var viewOptions = document.querySelectorAll('.view-option');
+            var containerCalendar = document.getElementById('calendar-container');
+            var containerDisponible = document.getElementById('vista-disponible-container');
+            var toolBotonesNav = document.getElementById('toolbar-botones-navegacion');
+
+            btnDropdown.addEventListener('click', function(e) {
+                e.preventDefault(); e.stopPropagation();
+                viewMenu.style.display = (viewMenu.style.display === 'none' || viewMenu.style.display === '') ? 'block' : 'none';
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!btnDropdown.contains(e.target) && !viewMenu.contains(e.target)) viewMenu.style.display = 'none';
+            });
+
+            viewOptions.forEach(function(option) {
+                option.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var viewName = this.getAttribute('data-view');
+
+                    if (viewName === 'disponible') {
+                        containerCalendar.style.display = 'none';
+                        toolBotonesNav.style.display = 'none'; // Ocultamos los botones de mes/semana/día cuando vemos esta tabla
+                        containerDisponible.style.display = 'block';
+                        renderTablaDisponible();
+                    } else {
+                        containerCalendar.style.display = 'block';
+                        toolBotonesNav.style.display = 'flex';
+                        containerDisponible.style.display = 'none';
+                        calendar.changeView(viewName);
+                    }
+                    
+                    currentViewText.innerText = this.innerText;
+                    viewOptions.forEach(opt => {
+                        opt.style.fontWeight = 'normal';
+                        opt.style.backgroundColor = 'transparent';
+                        opt.style.color = 'inherit';
+                    });
+                    this.style.fontWeight = 'bold';
+                    this.style.backgroundColor = '#f9fafb';
+                    this.style.color = '#1f2937';
+                    viewMenu.style.display = 'none';
+                });
+            });
+
+            // ACCIONES DEL BUSCADOR DE ESPACIOS
+            document.getElementById('btn-buscar-gap').addEventListener('click', function() {
+                let fechaInput = document.getElementById('filtro-gap-fecha').value;
+                if (!fechaInput) {
+                    alert('Por favor, seleccione una fecha base para buscar.');
+                    return;
+                }
+                gapFilterActive = true;
+                gapStartDate = new Date(fechaInput);
+                gapDurationMins = parseInt(document.getElementById('filtro-gap-minutos').value) || 60;
+                gapSalon = document.getElementById('filtro-gap-salon').value;
+                
+                renderTablaDisponible();
+            });
+
+            document.getElementById('btn-vaciar-gap').addEventListener('click', function(e) {
+                e.preventDefault();
+                gapFilterActive = false;
+                document.getElementById('filtro-gap-fecha').value = '';
+                document.getElementById('filtro-gap-salon').value = 'any';
+                renderTablaDisponible();
+            });
+
+            document.getElementById('btn-prev').addEventListener('click', function() { calendar.prev(); });
+            document.getElementById('btn-next').addEventListener('click', function() { calendar.next(); });
+            document.getElementById('btn-hoy').addEventListener('click', function() { calendar.today(); });
+
+            // Modales
             document.getElementById('close-modal').addEventListener('click', () => { document.getElementById('booking-modal').style.display = 'none'; });
             document.getElementById('btn-cancel').addEventListener('click', () => { document.getElementById('booking-modal').style.display = 'none'; });
-
             document.getElementById('close-edit-modal').addEventListener('click', () => { document.getElementById('edit-booking-modal').style.display = 'none'; });
             document.getElementById('btn-edit-cancel').addEventListener('click', () => { document.getElementById('edit-booking-modal').style.display = 'none'; });
 
@@ -1200,61 +1372,34 @@
 
                 fetch('/api/salones/reservas/' + eventId, {
                     method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                        'Accept': 'application/json'
-                    },
+                    headers: { 'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value, 'Accept': 'application/json' },
                     body: formData
-                })
-                .then(res => {
+                }).then(res => {
                     if (res.status === 422) {
                         return res.json().then(data => {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'No se pudo actualizar',
-                                text: data.message || 'El salón está ocupado en ese horario.',
-                                confirmButtonColor: '#2563eb'
-                            });
+                            Swal.fire({ icon: 'error', title: 'No se pudo actualizar', text: data.message || 'El salón está ocupado.', confirmButtonColor: '#2563eb' });
                             throw new Error('Conflicto');
                         });
                     }
                     return res.json();
-                })
-                .then(data => {
+                }).then(data => {
                     if(data.success) {
                         document.getElementById('edit-booking-modal').style.display = 'none';
                         calendar.refetchEvents();
                         miniEventDatesCache = {};
                         updateMiniCalendar(currentMiniYear, currentMiniMonth);
-                        
-                        Swal.fire({
-                            icon: 'success',
-                            title: '¡Actualizado!',
-                            text: 'La reserva se modificó correctamente.',
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
+                        Swal.fire({ icon: 'success', title: '¡Actualizado!', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
                     }
-                })
-                .catch(err => console.error(err));
+                }).catch(err => console.error(err));
             });
 
             var deleteButton = document.getElementById('btn-edit-delete');
             if (deleteButton) deleteButton.addEventListener('click', function() {
                 if(confirm('¿Estás seguro de que deseas eliminar esta reserva?')) {
-                    var eventId = document.getElementById('edit-event-id').value;
-                    
-                    fetch('/api/salones/reservas/' + eventId, {
+                    fetch('/api/salones/reservas/' + document.getElementById('edit-event-id').value, {
                         method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .then(res => res.json())
-                    .then(data => {
+                        headers: { 'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value, 'Accept': 'application/json' }
+                    }).then(res => res.json()).then(data => {
                         if(data.success) {
                             document.getElementById('edit-booking-modal').style.display = 'none';
                             calendar.refetchEvents();
@@ -1267,49 +1412,27 @@
 
             document.getElementById('booking-form').addEventListener('submit', function(e) {
                 e.preventDefault();
-                var formData = new FormData(this);
-
                 fetch('/api/salones/reservas', {
                     method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                        'Accept': 'application/json'
-                    },
-                    body: formData
-                })
-                .then(res => {
+                    headers: { 'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value, 'Accept': 'application/json' },
+                    body: new FormData(this)
+                }).then(res => {
                     if (res.status === 422) {
                         return res.json().then(data => {
-                            Swal.fire({
-                                icon: 'error',
-                                title: '¡Conflicto de Horario!',
-                                text: data.message || 'El salón ya está ocupado en ese horario.',
-                                confirmButtonColor: '#2563eb'
-                            });
+                            Swal.fire({ icon: 'error', title: '¡Conflicto!', text: data.message || 'El salón ya está ocupado.', confirmButtonColor: '#2563eb' });
                             throw new Error('Conflicto');
                         });
                     }
                     return res.json();
-                })
-                .then(data => {
+                }).then(data => {
                     if(data.success) {
                         document.getElementById('booking-modal').style.display = 'none';
                         calendar.refetchEvents();
                         miniEventDatesCache = {};
                         updateMiniCalendar(currentMiniYear, currentMiniMonth);
-                        
-                        Swal.fire({
-                            icon: 'success',
-                            title: '¡Reserva Completada!',
-                            text: 'El evento se registró correctamente.',
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 2500
-                        });
+                        Swal.fire({ icon: 'success', title: '¡Completada!', toast: true, position: 'top-end', showConfirmButton: false, timer: 2500 });
                     }
-                })
-                .catch(err => console.error(err));
+                }).catch(err => console.error(err));
             });
 
             var currentMiniYear = 2026;
@@ -1323,115 +1446,67 @@
                 var salonQuery = selectedSalonFilter ? `&salon=${encodeURIComponent(selectedSalonFilter)}` : '';
                 var cacheKey = `${year}-${month}-${selectedSalonFilter || 'all'}`;
                 if (!miniEventDatesCache[cacheKey]) {
-                    miniEventDatesCache[cacheKey] = fetch(`${urlFechasReservas}?year=${year}&month=${month}${salonQuery}`)
-                        .then(response => {
-                            if (!response.ok) throw new Error('No se pudieron cargar las fechas ocupadas.');
-                            return response.json();
-                        });
+                    miniEventDatesCache[cacheKey] = fetch(`${urlFechasReservas}?year=${year}&month=${month}${salonQuery}`).then(response => response.json());
                 }
 
-                miniEventDatesCache[cacheKey]
-                    .then(eventDates => {
-                        var firstDay = new Date(year, month - 1, 1);
-                        var lastDay = new Date(year, month, 0);
+                miniEventDatesCache[cacheKey].then(eventDates => {
+                    var firstDay = new Date(year, month - 1, 1);
+                    var lastDay = new Date(year, month, 0);
+                    var startingDay = firstDay.getDay();
+                    var totalDays = lastDay.getDate();
+
+                    var tbody = document.getElementById('mini-cal-body');
+                    tbody.innerHTML = '';
+                    var row = document.createElement('tr');
+                    var realToday = new Date(); realToday.setHours(0,0,0,0);
+                    var viewStart = calendar.view.currentStart;
+                    var viewEnd = calendar.view.currentEnd;
+
+                    var prevMonthLastDay = new Date(year, month - 1, 0).getDate();
+                    for (var i = startingDay - 1; i >= 0; i--) {
+                        var td = document.createElement('td'); td.innerText = prevMonthLastDay - i; td.style.color = '#d1d5db'; row.appendChild(td);
+                    }
+
+                    for (var day = 1; day <= totalDays; day++) {
+                        if (row.children.length === 7) { tbody.appendChild(row); row = document.createElement('tr'); }
+
+                        var td = document.createElement('td'); td.innerText = day; td.className = 'mc-hover';
+                        var fullDateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                        td.setAttribute('data-date', fullDateStr);
+
+                        var cellDate = new Date(year, month - 1, day); cellDate.setHours(0,0,0,0);
+                        var calendarDate = new Date(calendar.getDate()); calendarDate.setHours(0,0,0,0);
                         
-                        var startingDay = firstDay.getDay();
-                        var totalDays = lastDay.getDate();
+                        if (cellDate.getTime() === calendarDate.getTime()) td.classList.add('mc-selected-date');
+                        if (cellDate.getTime() === realToday.getTime()) td.classList.add('mc-today-real');
 
-                        var tbody = document.getElementById('mini-cal-body');
-                        tbody.innerHTML = '';
-
-                        var row = document.createElement('tr');
-                        var realToday = new Date();
-                        realToday.setHours(0,0,0,0);
-
-                        var viewStart = calendar.view.currentStart;
-                        var viewEnd = calendar.view.currentEnd;
-
-                        var prevMonthLastDay = new Date(year, month - 1, 0).getDate();
-                        for (var i = startingDay - 1; i >= 0; i--) {
-                            var td = document.createElement('td');
-                            td.innerText = prevMonthLastDay - i;
-                            td.style.color = '#d1d5db';
-                            row.appendChild(td);
+                        if (Array.isArray(eventDates) && eventDates.includes(fullDateStr)) {
+                            td.classList.add('mc-has-event');
+                            td.style.setProperty('background-color', (selectedSalonFilter ? salonColors[selectedSalonFilter] : '#f59e0b') || '#f59e0b', 'important');
                         }
 
-                        for (var day = 1; day <= totalDays; day++) {
-                            if (row.children.length === 7) {
-                                tbody.appendChild(row);
-                                row = document.createElement('tr');
-                            }
-
-                            var td = document.createElement('td');
-                            td.innerText = day;
-                            td.className = 'mc-hover';
-
-                            var monthFormatted = String(month).padStart(2, '0');
-                            var dayFormatted = String(day).padStart(2, '0');
-                            var fullDateStr = `${year}-${monthFormatted}-${dayFormatted}`;
-                            
-                            td.setAttribute('data-date', fullDateStr);
-
-                            var cellDate = new Date(year, month - 1, day);
-                            cellDate.setHours(0,0,0,0);
-
-                            var calendarDate = new Date(calendar.getDate());
-                            calendarDate.setHours(0,0,0,0);
-                            if (cellDate.getTime() === calendarDate.getTime()) {
-                                td.classList.add('mc-selected-date');
-                            }
-
-                            var cellTime = cellDate.getTime();
-                            var realTodayTime = realToday.getTime();
-                            if (cellTime === realTodayTime) {
-                                td.classList.add('mc-today-real');
-                            }
-
-                            if (Array.isArray(eventDates) && eventDates.includes(fullDateStr)) {
-                                td.classList.add('mc-has-event');
-                                var markerColor = selectedSalonFilter ? salonColors[selectedSalonFilter] : '#f59e0b';
-                                td.style.setProperty('background-color', markerColor || '#f59e0b', 'important');
-                            }
-
-                            if (viewStart && viewEnd) {
-                                var startTime = viewStart.getTime();
-                                var endTime = viewEnd.getTime();
-                                if (cellTime >= startTime && cellTime < endTime) {
-                                    row.classList.add('mc-row-selected');
-                                }
-                            }
-
-                            td.addEventListener('click', function() {
-                                var selectedDate = this.getAttribute('data-date');
-                                calendar.gotoDate(selectedDate);
-                            });
-
-                            row.appendChild(td);
+                        if (viewStart && viewEnd && cellDate.getTime() >= viewStart.getTime() && cellDate.getTime() < viewEnd.getTime()) {
+                            row.classList.add('mc-row-selected');
                         }
 
-                        var nextMonthDay = 1;
-                        while (row.children.length < 7) {
-                            var td = document.createElement('td');
-                            td.innerText = nextMonthDay++;
-                            td.style.color = '#d1d5db';
-                            row.appendChild(td);
-                        }
-                        tbody.appendChild(row);
-                    }).catch(err => {
-                        delete miniEventDatesCache[cacheKey];
-                        console.error("Error cargando fechas de eventos:", err);
-                    });
+                        td.addEventListener('click', function() { calendar.gotoDate(this.getAttribute('data-date')); });
+                        row.appendChild(td);
+                    }
+
+                    var nextMonthDay = 1;
+                    while (row.children.length < 7) {
+                        var td = document.createElement('td'); td.innerText = nextMonthDay++; td.style.color = '#d1d5db'; row.appendChild(td);
+                    }
+                    tbody.appendChild(row);
+                }).catch(err => { delete miniEventDatesCache[cacheKey]; console.error(err); });
             }
 
             document.getElementById('mini-prev').addEventListener('click', function() {
-                currentMiniMonth--;
-                if (currentMiniMonth < 1) { currentMiniMonth = 12; currentMiniYear--; }
+                currentMiniMonth--; if (currentMiniMonth < 1) { currentMiniMonth = 12; currentMiniYear--; }
                 updateMiniCalendar(currentMiniYear, currentMiniMonth);
             });
-
             document.getElementById('mini-next').addEventListener('click', function() {
-                currentMiniMonth++;
-                if (currentMiniMonth > 12) { currentMiniMonth = 1; currentMiniYear++; }
+                currentMiniMonth++; if (currentMiniMonth > 12) { currentMiniMonth = 1; currentMiniYear++; }
                 updateMiniCalendar(currentMiniYear, currentMiniMonth);
             });
 
@@ -1440,68 +1515,16 @@
             document.querySelectorAll('.salon-filter').forEach(function(button) {
                 button.addEventListener('click', function() {
                     selectedSalonFilter = this.dataset.salon === 'all' ? null : this.dataset.salon;
-
                     calendar.setOption('slotEventOverlap', selectedSalonFilter !== null);
-
-                    document.querySelectorAll('.salon-filter').forEach(function(filterButton) {
-                        var isActive = filterButton === button;
-                        filterButton.classList.toggle('active', isActive);
-                        filterButton.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                    document.querySelectorAll('.salon-filter').forEach(b => {
+                        var isAct = b === button;
+                        b.classList.toggle('active', isAct);
+                        b.setAttribute('aria-pressed', isAct ? 'true' : 'false');
                     });
-
                     calendar.refetchEvents();
                     updateMiniCalendar(currentMiniYear, currentMiniMonth);
                 });
             });
-
-            // Menú de Vistas (Corregido)
-            var btnDropdown = document.getElementById('btn-view-dropdown');
-            var viewMenu = document.getElementById('view-menu');
-            var currentViewText = document.getElementById('current-view-text');
-            var viewOptions = document.querySelectorAll('.view-option');
-
-            btnDropdown.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                if (viewMenu.style.display === 'none' || viewMenu.style.display === '') {
-                    viewMenu.style.display = 'block';
-                } else {
-                    viewMenu.style.display = 'none';
-                }
-            });
-
-            document.addEventListener('click', function(e) {
-                if (!btnDropdown.contains(e.target) && !viewMenu.contains(e.target)) {
-                    viewMenu.style.display = 'none';
-                }
-            });
-
-            viewOptions.forEach(function(option) {
-                option.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    var viewName = this.getAttribute('data-view');
-
-                    calendar.changeView(viewName);
-                    
-                    currentViewText.innerText = this.innerText;
-
-                    viewOptions.forEach(function(opt) {
-                        opt.style.fontWeight = 'normal';
-                        opt.style.backgroundColor = 'transparent';
-                        opt.style.color = 'inherit';
-                    });
-
-                    this.style.fontWeight = 'bold';
-                    this.style.backgroundColor = '#f9fafb';
-                    this.style.color = '#1f2937';
-
-                    viewMenu.style.display = 'none';
-                });
-            });
-            document.getElementById('btn-prev').addEventListener('click', function() { calendar.prev(); });
-            document.getElementById('btn-next').addEventListener('click', function() { calendar.next(); });
-            document.getElementById('btn-hoy').addEventListener('click', function() { calendar.today(); });
         });
     </script>
 </x-app-layout>
