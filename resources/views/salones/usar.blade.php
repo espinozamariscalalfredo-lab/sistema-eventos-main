@@ -45,9 +45,14 @@
         .fc-timeGridDay-view .fc-reserva-contenido {
             box-sizing: border-box;
             max-width: 100%;
+            height: 100%;
             font-size: calc(1em - 2pt);
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
+            scrollbar-width: none;
+            overscroll-behavior: contain;
         }
+        .fc-timeGridDay-view .fc-reserva-contenido::-webkit-scrollbar { display: none; }
         .fc-timeGridDay-view .fc-reserva-titulo,
         .fc-timeGridDay-view .fc-reserva-detalle {
             font-weight: 400 !important;
@@ -93,6 +98,24 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis; 
+        }
+
+        .fc-reserva-indicador-cancelado {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            flex: 0 0 6px;
+            border-radius: 50%;
+            background: #dc2626;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, .9);
+            vertical-align: middle;
+        }
+
+        .fc-dayGridMonth-view .fc-reserva-titulo-cancelado {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            min-width: 0;
         }
         
         .fc-dayGridMonth-view .fc-daygrid-day-frame {
@@ -177,25 +200,45 @@
             overflow: visible;
             text-align: center;
         }
+        .fc-reserva-contenido-semana .fc-reserva-indicador-cancelado {
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            z-index: 2;
+        }
         .fc-reserva-contenido-semana .fc-reserva-hora {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             white-space: nowrap;
             overflow: visible;
             text-align: center;
             font-size: 10px;
+            line-height: 1.1;
         }
-        .fc-reserva-titulo-semana {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: max-content;
-            max-width: none;
-            transform: translate(-50%, -50%) rotate(90deg);
-            white-space: nowrap;
-            text-align: center;
+        .fc-reserva-minutos-semana {
+            font-size: 9px;
+        }
+        .fc-reserva-periodo-semana {
+            font-size: 8px;
+            text-transform: uppercase;
+        }
+        .fc-reserva-estado-cancelado {
+            display: inline-flex;
+            align-items: center;
+            flex: 0 0 auto;
+            padding: 2px 7px;
+            border: 1px solid #fecaca;
+            border-radius: 999px;
+            background: #dc2626;
+            color: #fff;
+            font-size: 9px;
             font-weight: 700;
-            line-height: 1.05;
-            z-index: 2;
+            line-height: 1.2;
+            vertical-align: middle;
+            box-shadow: 0 1px 2px rgba(127,29,29,.25);
         }
+        .fc-timeGridDay-view .fc-reserva-titulo { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
         .fc-timegrid-event, .fc-timegrid-event .fc-event-main { overflow: visible !important; }
     </style>
 
@@ -308,9 +351,9 @@
                                 <i class="fa-solid fa-clock"></i>
                             </div>
                             <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                                <input type="text" id="modal-start" name="fecha_inicio" style="flex: 1; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 4px; padding: 8px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
+                                <input type="datetime-local" id="modal-start" name="fecha_inicio" step="60" style="flex: 1; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 4px; padding: 8px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
                                 <span style="font-size: 13px; color: #475b75;">hasta</span>
-                                <input type="text" id="modal-end" name="fecha_fin" style="flex: 1; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 4px; padding: 8px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
+                                <input type="datetime-local" id="modal-end" name="fecha_fin" step="60" style="flex: 1; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 4px; padding: 8px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
                             </div>
                         </div>
 
@@ -481,9 +524,9 @@
                                 <i class="fa-solid fa-clock"></i>
                             </div>
                             <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                                <input type="text" id="edit-start" name="fecha_inicio" style="flex: 1; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 4px; padding: 8px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
+                                <input type="datetime-local" id="edit-start" name="fecha_inicio" step="60" style="flex: 1; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 4px; padding: 8px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
                                 <span style="font-size: 13px; color: #475b75;">hasta</span>
-                                <input type="text" id="edit-end" name="fecha_fin" style="flex: 1; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 4px; padding: 8px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
+                                <input type="datetime-local" id="edit-end" name="fecha_fin" step="60" style="flex: 1; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 4px; padding: 8px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
                             </div>
                         </div>
 
@@ -495,6 +538,19 @@
                                 <textarea id="edit-title" name="titulo" maxlength="150" placeholder="Descripción *" rows="2" style="width: 100%; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 4px; padding: 8px 12px; font-size: 13px; color: #1e293b; outline: none; resize: none;" required></textarea>
                             </div>
                         </div>
+
+                        @if(auth()->user()->rol === 'superadmin')
+                            <div style="display: flex; align-items: center; gap: 16px; margin: 0 0 16px 40px; padding: 12px 14px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc;">
+                                <div style="flex: 1;">
+                                    <label for="edit-event-state" style="display: block; margin-bottom: 4px; color: #334155; font-size: 13px; font-weight: 600;">Estado del evento</label>
+                                    <span style="color: #64748b; font-size: 11px;">Se muestra junto al título; se guarda quién y cuándo lo cambió.</span>
+                                </div>
+                                <select id="edit-event-state" name="estado" style="min-width: 145px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 10px; background: #fff; color: #1e293b; font-size: 13px;">
+                                    <option value="programado">Programado</option>
+                                    <option value="cancelado">Cancelado</option>
+                                </select>
+                            </div>
+                        @endif
 
                         <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
                             <div style="width: 24px; text-align: center; color: #64748b; font-size: 18px;">
@@ -687,6 +743,22 @@
                 }
             }
 
+            // Reaplica posiciones después del cambio de vista y del recálculo de ancho.
+            function reaplicarCarrilesEnVista(viewType) {
+                if (viewType !== 'timeGridDay' && viewType !== 'timeGridWeek') return;
+
+                calendarEl.querySelectorAll('.fc-timegrid-event[data-reserva-id]').forEach(function(elemento) {
+                    var evento = calendar.getEventById(elemento.dataset.reservaId);
+                    if (evento) {
+                        posicionarEventoEnCarril({
+                            el: elemento,
+                            event: evento,
+                            view: { type: viewType }
+                        });
+                    }
+                });
+            }
+
             // Devuelve el salón que corresponde a la columna donde se seleccionó.
             function salonSeleccionadoEnCarril(info) {
                 if (selectedSalonFilter) return selectedSalonFilter;
@@ -730,9 +802,11 @@
                 var props = evento.extendedProps;
 
                 document.getElementById('edit-event-id').value = evento.id;
-                document.getElementById('edit-start').value = evento.startStr.slice(0, 16).replace('T', ' ');
-                document.getElementById('edit-end').value = evento.endStr ? evento.endStr.slice(0, 16).replace('T', ' ') : '';
+                document.getElementById('edit-start').value = evento.startStr.slice(0, 16);
+                document.getElementById('edit-end').value = evento.endStr ? evento.endStr.slice(0, 16) : '';
                 document.getElementById('edit-title').value = evento.title;
+                var selectorEstado = document.getElementById('edit-event-state');
+                if (selectorEstado) selectorEstado.value = props.estado || 'programado';
                 document.getElementById('edit-username').value = props.nombre_usuario || '';
                 document.getElementById('edit-phone').value = props.telefono_usuario || '';
                 
@@ -778,6 +852,10 @@
                 initialDate: parametrosInicio.get('fecha') || undefined,
                 locale: 'es',
                 firstDay: 0,
+                views: {
+                    // El mes empieza en domingo para mantener el orden DO-LU-MA-MI-JU-VI-SA (19/10/2026).
+                    dayGridMonth: { firstDay: 0 }
+                },
                 height: 800,
                 allDaySlot: false, 
                 slotEventOverlap: false,
@@ -833,9 +911,19 @@
                         horaMes.textContent = arg.timeText.split(' - ')[0] || arg.timeText; 
                         contenido.appendChild(horaMes);
                         
-                        var tituloMes = document.createElement('span'); 
+                        var tituloMes = document.createElement('span');
                         tituloMes.className = 'fc-reserva-titulo';
-                        tituloMes.textContent = arg.event.title || '';
+                        if (props.estado === 'cancelado') {
+                            tituloMes.classList.add('fc-reserva-titulo-cancelado');
+                            var indicadorMes = document.createElement('span');
+                            indicadorMes.className = 'fc-reserva-indicador-cancelado';
+                            indicadorMes.setAttribute('aria-label', 'Evento cancelado');
+                            indicadorMes.title = 'Cancelado';
+                            tituloMes.appendChild(indicadorMes);
+                        }
+                        var nombreMes = document.createElement('span');
+                        nombreMes.textContent = arg.event.title || '';
+                        tituloMes.appendChild(nombreMes);
                         contenido.appendChild(tituloMes);
                         
                         return { domNodes: [contenido] };
@@ -848,11 +936,33 @@
 
                     if (arg.view.type === 'timeGridWeek') {
                         contenido.classList.add('fc-reserva-contenido-semana');
+                        if (props.estado === 'cancelado') {
+                            var indicadorSemana = document.createElement('span');
+                            indicadorSemana.className = 'fc-reserva-indicador-cancelado';
+                            indicadorSemana.setAttribute('aria-label', 'Evento cancelado');
+                            indicadorSemana.title = 'Cancelado';
+                            contenido.appendChild(indicadorSemana);
+                        }
+                        // Semana: hora, minutos y AM/PM en líneas separadas (19/10/2026).
+                        var horaInicio = arg.event.start;
+                        hora.textContent = '';
+                        var hora24 = horaInicio.getHours();
+                        var hora12 = hora24 % 12 || 12;
 
-                        var tituloSemana = document.createElement('div');
-                        tituloSemana.className = 'fc-reserva-titulo-semana';
-                        tituloSemana.textContent = props.salon || '';
-                        contenido.appendChild(tituloSemana);
+                        var horaNumero = document.createElement('span');
+                        horaNumero.textContent = String(hora12).padStart(2, '0');
+
+                        var minutos = document.createElement('span');
+                        minutos.className = 'fc-reserva-minutos-semana';
+                        minutos.textContent = String(horaInicio.getMinutes()).padStart(2, '0');
+
+                        var periodo = document.createElement('span');
+                        periodo.className = 'fc-reserva-periodo-semana';
+                        periodo.textContent = hora24 < 12 ? 'AM' : 'PM';
+
+                        hora.appendChild(horaNumero);
+                        hora.appendChild(minutos);
+                        hora.appendChild(periodo);
 
                         return { domNodes: [contenido] };
                     }
@@ -871,7 +981,20 @@
                         if (detalle.valor === null || detalle.valor === undefined || String(detalle.valor).trim() === '') return;
                         var linea = document.createElement('div');
                         linea.className = detalle.clase;
-                        linea.textContent = detalle.valor;
+                        if (detalle.clase === 'fc-reserva-titulo') {
+                            if (props.estado === 'cancelado') {
+                                var estadoDia = document.createElement('span');
+                                estadoDia.className = 'fc-reserva-estado-cancelado';
+                                estadoDia.textContent = 'CANCELADO';
+                                linea.appendChild(estadoDia);
+                            }
+
+                            var tituloTexto = document.createElement('span');
+                            tituloTexto.textContent = detalle.valor;
+                            linea.appendChild(tituloTexto);
+                        } else {
+                            linea.textContent = detalle.valor;
+                        }
                         contenido.appendChild(linea);
                     });
 
@@ -879,7 +1002,19 @@
                 },
 
                 eventDidMount: function(info) {
+                    info.el.dataset.reservaId = info.event.id;
                     posicionarEventoEnCarril(info);
+
+                    if (info.view.type === 'timeGridDay') {
+                        var contenidoDia = info.el.querySelector('.fc-reserva-contenido');
+                        if (contenidoDia) {
+                            contenidoDia.addEventListener('wheel', function(eventoRueda) {
+                                if (contenidoDia.scrollHeight > contenidoDia.clientHeight) {
+                                    eventoRueda.stopPropagation();
+                                }
+                            }, { passive: true });
+                        }
+                    }
 
                     var props = info.event.extendedProps;
                     var detalles = [
@@ -895,9 +1030,23 @@
                     ].filter(function(valor) {
                         return valor !== null && valor !== undefined && String(valor).trim() !== '';
                     });
+                    if (props.estado === 'cancelado') detalles.push('Estado: Cancelado');
 
                     info.el.setAttribute('title', detalles.join('\n'));
                     info.el.setAttribute('aria-label', detalles.join(', '));
+                },
+
+                eventsSet: function() {
+                    var viewType = calendar.view.type;
+                    if (viewType !== 'timeGridDay' && viewType !== 'timeGridWeek') return;
+
+                    // Espera el recálculo que ocurre al aplicar un filtro de salón.
+                    requestAnimationFrame(function() {
+                        calendar.updateSize();
+                        requestAnimationFrame(function() {
+                            reaplicarCarrilesEnVista(viewType);
+                        });
+                    });
                 },
 
                 select: function(info) {
@@ -908,8 +1057,9 @@
                     }
 
                     var modal = document.getElementById('booking-modal');
-                    document.getElementById('modal-start').value = info.startStr.slice(0, 19).replace('T', ' ');
-                    document.getElementById('modal-end').value = info.endStr.slice(0, 19).replace('T', ' ');
+                    // datetime-local necesita fecha y hora separadas por T (19/10/2026).
+                    document.getElementById('modal-start').value = info.startStr.slice(0, 16);
+                    document.getElementById('modal-end').value = info.endStr.slice(0, 16);
                     var salon = salonSeleccionadoEnCarril(info);
                     var salonSelect = modal.querySelector('select[name="salon"]');
                     if (salon && salonSelect && Array.from(salonSelect.options).some(function(option) { return option.value === salon; })) {
@@ -946,6 +1096,12 @@
 
                     var dayNames = ['DO', 'LU', 'MA', 'MI', 'JU', 'VI', 'SA'];
                     var dayStr = dayNames[arg.date.getDay()];
+                    if (arg.view.type === 'dayGridMonth') {
+                        return {
+                            html: '<div style="text-align: center; text-transform: uppercase; font-size: 0.8rem; color: #64748b; font-weight: 400;">'
+                                + dayStr + '</div>'
+                        };
+                    }
                     var dateNum = arg.date.getDate();
                     var hoy = new Date();
                     var esHoy = arg.view.type === 'timeGridWeek'
@@ -962,6 +1118,16 @@
                 },
                 datesSet: function(info) {
                     ajustarAnchoCarriles(info.view.type);
+
+                    // FullCalendar debe terminar el cambio antes de repartir los carriles.
+                    if (info.view.type === 'timeGridDay' || info.view.type === 'timeGridWeek') {
+                        requestAnimationFrame(function() {
+                            calendar.updateSize();
+                            requestAnimationFrame(function() {
+                                reaplicarCarrilesEnVista(info.view.type);
+                            });
+                        });
+                    }
 
                     var titleEl = document.getElementById('calendar-title');
                     if (info.view.type === 'timeGridWeek') {

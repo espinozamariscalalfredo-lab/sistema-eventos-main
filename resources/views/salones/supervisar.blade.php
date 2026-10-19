@@ -496,9 +496,9 @@
                             <i class="fa-solid fa-clock"></i>
                         </div>
                         <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                            <input type="text" id="modal-start" name="fecha_inicio" style="flex: 1; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 4px; padding: 8px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
+                            <input type="datetime-local" id="modal-start" name="fecha_inicio" step="60" style="flex: 1; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 4px; padding: 8px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
                             <span style="font-size: 13px; color: #475b75;">hasta</span>
-                            <input type="text" id="modal-end" name="fecha_fin" style="flex: 1; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 4px; padding: 8px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
+                            <input type="datetime-local" id="modal-end" name="fecha_fin" step="60" style="flex: 1; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 4px; padding: 8px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
                         </div>
                     </div>
                     <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
@@ -652,9 +652,9 @@
                             <i class="fa-solid fa-clock"></i>
                         </div>
                         <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                            <input type="text" id="edit-start" name="fecha_inicio" style="flex: 1; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 4px; padding: 8px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
+                            <input type="datetime-local" id="edit-start" name="fecha_inicio" step="60" style="flex: 1; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 4px; padding: 8px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
                             <span style="font-size: 13px; color: #475b75;">hasta</span>
-                            <input type="text" id="edit-end" name="fecha_fin" style="flex: 1; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 4px; padding: 8px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
+                            <input type="datetime-local" id="edit-end" name="fecha_fin" step="60" style="flex: 1; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 4px; padding: 8px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
                         </div>
                     </div>
                     <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">

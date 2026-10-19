@@ -11,6 +11,25 @@ use Illuminate\Validation\Rule;
 // Cambio documentado: 13/10/2026. Aquí se aplican las reglas antes de guardar.
 class ReservaController extends Controller
 {
+    // 19/10/2026: el prefijo queda en reservas.titulo, sin crear columnas nuevas.
+    private function leerEstadoTitulo(string $titulo): array
+    {
+        $marcador = '/^\s*\[CANCELADO\]\s*/iu';
+        $cancelado = preg_match($marcador, $titulo) === 1;
+
+        return [
+            preg_replace($marcador, '', $titulo, 1) ?? $titulo,
+            $cancelado ? 'cancelado' : 'programado',
+        ];
+    }
+
+    private function guardarEstadoEnTitulo(string $titulo, string $estado): string
+    {
+        [$tituloLimpio] = $this->leerEstadoTitulo($titulo);
+
+        return $estado === 'cancelado' ? '[CANCELADO] '.$tituloLimpio : $tituloLimpio;
+    }
+
     private function salonesValidos(?Reserva $reserva = null): array
     {
         // Conserva el salón actual aunque ya esté inactivo.
@@ -39,11 +58,12 @@ class ReservaController extends Controller
         $reservas = Reserva::all()->map(function ($reserva) use ($salonColors) {
             // Las reservas antiguas sin salón usan un color de respaldo.
             $color = $salonColors[$reserva->salon] ?? '#f59e0b';
+            [$titulo, $estado] = $this->leerEstadoTitulo($reserva->titulo);
 
             return [
                 // FullCalendar requiere estas tres claves en inglés.
                 'id' => $reserva->id,
-                'title' => $reserva->titulo,
+                'title' => $titulo,
                 'start' => $reserva->fecha_inicio,
                 'end' => $reserva->fecha_fin,
                 'display' => 'block',
@@ -67,6 +87,7 @@ class ReservaController extends Controller
                 'modificado_por' => $reserva->modificado_por,
                 'salon' => $reserva->salon,
                 'fecha_creacion' => $reserva->fecha_creacion,
+                'estado' => $estado,
             ];
         });
 
@@ -151,6 +172,9 @@ class ReservaController extends Controller
             'salon' => ['required', 'string', Rule::in($this->salonesValidos())],
         ]);
 
+        // Solo una reserva existente puede cancelarse desde el selector de superadmin.
+        $validated['titulo'] = $this->guardarEstadoEnTitulo($validated['titulo'], 'programado');
+
         // ==========================================
         // VALIDACIÓN: PREVENIR CRUCE DE HORARIOS
         // ==========================================
@@ -190,6 +214,9 @@ class ReservaController extends Controller
     public function obtenerReservaApi($id)
     {
         $reserva = Reserva::findOrFail($id);
+        [$titulo, $estado] = $this->leerEstadoTitulo($reserva->titulo);
+        $reserva->setAttribute('titulo', $titulo);
+        $reserva->setAttribute('estado', $estado);
 
         return response()->json($reserva);
     }
@@ -203,8 +230,17 @@ class ReservaController extends Controller
 
         $reserva = Reserva::findOrFail($id);
 
+        // Solo superadmin puede cambiar el estado visible del evento.
+        if ($request->exists('estado') && auth()->user()->rol !== 'superadmin') {
+            return response()->json(['success' => false, 'message' => 'Solo el superadmin puede cambiar el estado del evento.'], 403);
+        }
+
+        [, $estadoActual] = $this->leerEstadoTitulo($reserva->titulo);
+        $estadoSolicitado = $request->input('estado', $estadoActual);
+        $maxTitulo = $estadoSolicitado === 'cancelado' ? 243 : 255;
+
         $validated = $request->validate([
-            'titulo' => 'required|string|max:255',
+            'titulo' => ['required', 'string', 'max:'.$maxTitulo],
             'fecha_inicio' => 'required|date',
             'fecha_fin' => 'required|date|after:fecha_inicio',
             'nombre_usuario' => 'nullable|string',
@@ -213,6 +249,16 @@ class ReservaController extends Controller
             'responsable' => 'nullable|string',
             'salon' => ['required', 'string', Rule::in($this->salonesValidos($reserva))],
         ]);
+
+        if ($request->exists('estado')) {
+            $estadoValidado = $request->validate([
+                'estado' => ['required', Rule::in(['programado', 'cancelado'])],
+            ])['estado'];
+        } else {
+            $estadoValidado = $estadoActual;
+        }
+        // Al editar, el prefijo guarda la cancelación dentro del mismo título.
+        $validated['titulo'] = $this->guardarEstadoEnTitulo($validated['titulo'], $estadoValidado);
 
         // VALIDACIÓN DE CRUCE AL EDITAR (Excluyendo el ID actual)
         $conflicto = Reserva::where('salon', $validated['salon'])
@@ -290,6 +336,9 @@ class ReservaController extends Controller
             'registrado_por' => 'nullable|string',
             'coordinador_interno' => 'nullable|string',
         ]);
+
+        [, $estadoActual] = $this->leerEstadoTitulo($reserva->titulo);
+        $validated['titulo'] = $this->guardarEstadoEnTitulo($validated['titulo'], $estadoActual);
 
         $validated['modificado_por'] = $this->actorActual();
         $reserva->update($validated);
@@ -372,6 +421,7 @@ class ReservaController extends Controller
         $validated['fecha_fin'] = now()->addHour();
         $validated['nombre_usuario'] = auth()->user()->nombre ?? 'Administrador';
         $validated['modificado_por'] = $this->actorActual();
+        $validated['titulo'] = $this->guardarEstadoEnTitulo($validated['titulo'], 'programado');
 
         Reserva::create($validated);
 
