@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* FRONTEND. 20/10/2026: punto de entrada de estilos compartidos y tema oscuro. */
 /* Modo oscuro global. Los colores de los eventos se conservan. */
 html[data-tema="oscuro"] body { background: #0b1120; color: #e2e8f0; }
 html[data-tema="oscuro"] .min-h-screen,

@@ -1,5 +1,7 @@
+{{-- FRONTEND. 20/10/2026: pantalla de supervisión, filtros, tabla, papelera y edición. --}}
 {{-- Cambio al español: 12/10/2026. La vista usa nombres de reservas y campos en español. --}}
 <x-app-layout>
+    {{-- LIBRERÍAS. 20/10/2026: FullCalendar, idioma español, Font Awesome y SweetAlert. --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Usamos la versión core normal de FullCalendar -->
@@ -8,6 +10,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
+        /* ESTILOS. 20/10/2026: calendario, tabla compacta, filtros y adaptación móvil. */
+        /* Controles de interfaz reutilizados en esta pantalla. */
         .tabla-icono-accion { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; margin-left: 4px; border: 0; border-radius: 7px; background: transparent; color: #3b82f6; font-size: 16px; text-decoration: none; cursor: pointer; transition: background-color .15s ease, color .15s ease; }
         .tabla-icono-accion:hover, .tabla-icono-accion:focus-visible { background: #eff6ff; color: #1d4ed8; outline: none; }
         /* Estilo para cuando agarras una columna para moverla */
@@ -15,6 +19,7 @@
         th.arrastrable:active { cursor: grabbing; background-color: #e2e8f0; }
         .drag-over { border-left: 3px solid #2563eb !important; }
         
+        /* Estilos de calendario y eventos visibles en supervisión. */
         .fc .fc-toolbar { display: none !important; }
         .fc-theme-standard th, .fc-theme-standard td { border-color: #e2e8f0; }
         .fc-theme-standard th { border-top: none !important; padding-bottom: 8px; border-left: none !important; border-right: none !important; }
@@ -141,6 +146,34 @@
             background-color: #f59e0b !important;
         }
 
+        /* Tabla de reservas: columnas compactas y desplazamiento horizontal en móvil. */
+        /* 2026-10-20: se redujeron espacios y se agregaron anchos adaptables. */
+        .supervisar-tabla-scroll { width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+        #tabla-dinamica { width: 100%; min-width: 1020px; table-layout: fixed; font-size: 12px !important; }
+        #tabla-dinamica th, #tabla-dinamica td { padding: 6px 8px !important; vertical-align: middle; }
+        #tabla-dinamica th:nth-child(1), #tabla-dinamica td:nth-child(1) { width: 110px; }
+        #tabla-dinamica th:nth-child(2), #tabla-dinamica td:nth-child(2) { width: 118px; }
+        #tabla-dinamica th:nth-child(3), #tabla-dinamica td:nth-child(3) { width: 190px; }
+        #tabla-dinamica th:nth-child(4), #tabla-dinamica td:nth-child(4) { width: 110px; }
+        #tabla-dinamica th:nth-child(5), #tabla-dinamica td:nth-child(5) { width: 155px; }
+        #tabla-dinamica th:nth-child(6), #tabla-dinamica td:nth-child(6) { width: 100px; }
+        #tabla-dinamica th:nth-child(7), #tabla-dinamica td:nth-child(7) { width: 100px; }
+        #tabla-dinamica th:nth-child(8), #tabla-dinamica td:nth-child(8) { width: 125px; }
+        #tabla-dinamica th:nth-child(9), #tabla-dinamica td:nth-child(9) { width: 105px; }
+        #tabla-dinamica td:nth-child(1), #tabla-dinamica td:nth-child(2),
+        #tabla-dinamica td:nth-child(6), #tabla-dinamica td:nth-child(7),
+        #tabla-dinamica td:nth-child(8), #tabla-dinamica td:nth-child(9) { white-space: normal !important; overflow-wrap: anywhere; }
+        #tabla-dinamica td:nth-child(3) > div, #tabla-dinamica td:nth-child(4) > div,
+        #tabla-dinamica td:nth-child(5) > div { overflow-wrap: anywhere; }
+        #tabla-dinamica tbody tr:hover { background-color: #f8fafc; }
+        .supervisar-filtros { flex-wrap: wrap; gap: 10px 16px !important; min-width: 0; }
+        .supervisar-filtro-form { min-width: 0; max-width: 100%; }
+        .supervisar-filtro-form label { white-space: nowrap; }
+        .supervisar-filtro-form select { max-width: min(230px, 62vw); }
+        .supervisar-papelera-link { display: inline-flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 6px; color: #2563eb; text-decoration: none; white-space: nowrap; }
+        .supervisar-papelera-link:hover, .supervisar-papelera-link:focus-visible { background: #eff6ff; text-decoration: underline; outline: none; }
+        .supervisar-acciones-tabla { flex-wrap: wrap; }
+
         @media (max-width: 900px) {
             .salones-cal-layout { flex-direction: column !important; gap: 16px !important; }
             .salones-cal-main, .salones-cal-side { width: 100% !important; min-width: 0 !important; }
@@ -153,10 +186,35 @@
             .salones-calendar-scroll { overflow-x: auto; }
             .salones-calendar-scroll #calendar { min-width: 560px; }
             .edit-modal-panel { max-height: calc(100dvh - 24px) !important; }
+            #tabla-dinamica { min-width: 900px; }
+            #tabla-dinamica th, #tabla-dinamica td { padding: 5px 6px !important; }
+            .supervisar-filtros { flex: 1 1 100%; width: 100%; gap: 8px !important; }
+            .supervisar-filtro-form { flex: 1 1 220px; }
+            .supervisar-filtro-form select { min-width: 0; width: min(100%, 230px); }
+            .supervisar-papelera-link { flex: 1 1 100%; justify-content: center; border: 1px solid #bfdbfe; background: #eff6ff; }
+            .supervisar-acciones-tabla { width: 100%; gap: 8px !important; }
         }
         .edit-modal-drag-handle { cursor: move; touch-action: none; user-select: none; }
+        /* 2026-10-20: fecha/hora escrita y minicalendario compacto, con el selector nativo del navegador reemplazado. */
+        .fecha-hora-control { position: relative; display: flex; flex: 1; min-width: 0; }
+        .fecha-hora-texto { box-sizing: border-box; width: 100%; min-width: 0; flex: 1; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 4px; padding: 8px 12px; font: inherit; font-size: 13px; color: #1e293b; outline: none; }
+        .fecha-hora-control:focus-within .fecha-hora-texto { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, .12); }
+        .fecha-hora-valor { position: absolute; left: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+        .fecha-mini-calendario { display: none; position: fixed; z-index: 10000; box-sizing: border-box; width: 194px; padding: 6px; border: 1px solid #cbd5e1; border-radius: 5px; background: #fff; color: #334155; box-shadow: 0 5px 14px rgba(15, 23, 42, .2); font: 12px Arial, sans-serif; }
+        .fecha-mini-calendario.is-open { display: block; }
+        .fecha-mini-cal-header { display: flex; align-items: center; justify-content: space-between; height: 24px; margin-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+        .fecha-mini-mes { flex: 1; text-align: center; font-weight: 700; text-transform: lowercase; }
+        .fecha-mini-nav { width: 24px; height: 22px; padding: 0; border: 0; background: transparent; color: #2563eb; font-size: 19px; line-height: 20px; cursor: pointer; }
+        .fecha-mini-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; text-align: center; }
+        .fecha-mini-semana { padding: 3px 0; color: #334155; font-weight: 700; }
+        .fecha-mini-dia { height: 22px; padding: 0; border: 1px solid transparent; border-radius: 2px; background: transparent; color: #1e293b; font: inherit; cursor: pointer; }
+        .fecha-mini-dia:hover { background: #dbeafe; }
+        .fecha-mini-dia.otro-mes { color: #94a3b8; }
+        .fecha-mini-dia.hoy { border-color: #2563eb; }
+        .fecha-mini-dia.seleccionado { background: #2563eb; color: #fff; }
     </style>
     
+    <!-- HTML/BLADE del frontend. Los permisos y consultas se aplican en el backend. -->
     <div class="min-h-screen bg-white py-6 px-4 sm:px-8">
         <div style="max-width: 1400px; margin: 0 auto;">
             
@@ -190,11 +248,12 @@
                 <!-- Panel de Herramientas Dinámicas -->
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
                     
-                    <div style="display: flex; align-items: center; gap: 20px; font-size: 14px;">
+                    <div class="supervisar-filtros" style="display: flex; align-items: center; gap: 20px; font-size: 14px;">
                         
                         <!-- Filtro por salón -->
                         <form method="GET"
                             action="{{ route('salones.supervisar') }}"
+                            class="supervisar-filtro-form"
                             style="display: flex; align-items: center; gap: 6px;">
 
                             <label for="filtro-salon-supervisar"
@@ -232,6 +291,7 @@
                         <!-- NUEVO: Filtro independiente por responsable -->
                         <form method="GET"
                             action="{{ route('salones.supervisar') }}"
+                            class="supervisar-filtro-form"
                             style="display: flex; align-items: center; gap: 6px;">
 
                             <label for="filtro-responsable-supervisar"
@@ -266,11 +326,14 @@
                                 <button type="submit">Filtrar</button>
                             </noscript>
                         </form>
-                        <a href="{{ route('salones.papelera') }}" style="color: #3b82f6; text-decoration: underline;">Mostrar papelera</a>
+                        <a class="supervisar-papelera-link" href="{{ route('salones.papelera') }}">
+                            <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+                            <span>Mostrar papelera</span>
+                        </a>
                     </div>
 
                     <!-- Nuevos Botones de Control (Columnas y Exportar) -->
-                    <div style="display: flex; gap: 12px; align-items: center;">
+                    <div class="supervisar-acciones-tabla" style="display: flex; gap: 12px; align-items: center;">
                         
                         <!-- Botón Desplegable de Columnas -->
                         <div style="position: relative;" id="contenedor-columnas">
@@ -293,8 +356,8 @@
                 </div>
 
                 <!-- TABLA PRINCIPAL DE RESERVAS -->
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; margin-bottom: 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-                    <div style="overflow-x: auto;">
+                <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                    <div class="supervisar-tabla-scroll">
                         <table id="tabla-dinamica" style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left;">
                             <thead>
                                 <tr style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
@@ -400,7 +463,7 @@
                             $paginaFinal = $reservas->currentPage() + 4;
                         }
                     @endphp
-                    <nav aria-label="Paginación de reservas" style="display: flex; align-items: center; gap: 6px; margin: -24px 0 40px;">
+                    <nav aria-label="Paginación de reservas" style="display: flex; align-items: center; gap: 6px; margin: 0 0 24px; flex-wrap: wrap;">
                         @if($reservas->onFirstPage())
                             <span aria-disabled="true" style="padding: 5px 8px; border: 1px solid #d1d5db; border-radius: 6px; color: #cbd5e1;">&#171;</span>
                         @else
@@ -800,9 +863,142 @@
         </div>
     </div>
 
-    <!-- SCRIPT MÁGICO DE TABLA DINÁMICA Y EXPORTACIÓN -->
+    <!-- JavaScript frontend. 20/10/2026: orden de columnas, filtros y descarga de la tabla. -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // 2026-10-20: los formularios de crear/editar aceptan fecha y hora escrita y el mini calendario.
+            const fechaHoraComoTexto = (valor) => {
+                const partes = String(valor || '').match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}:\d{2})/);
+                return partes ? `${partes[1]}/${partes[2]}/${partes[3]} ${partes[4]}` : '';
+            };
+            const textoComoFechaHora = (texto) => {
+                const partes = String(texto || '').trim().match(/^(\d{4})\/(\d{2})\/(\d{2})\s+(\d{1,2}):(\d{2})$/);
+                if (!partes) return '';
+                const hora = Number(partes[4]);
+                const minuto = Number(partes[5]);
+                const fecha = new Date(Number(partes[1]), Number(partes[2]) - 1, Number(partes[3]), hora, minuto);
+                if (fecha.getFullYear() !== Number(partes[1]) || fecha.getMonth() !== Number(partes[2]) - 1 || fecha.getDate() !== Number(partes[3]) || fecha.getHours() !== hora || fecha.getMinutes() !== minuto || hora > 23 || minuto > 59) return '';
+                return `${partes[1]}-${partes[2]}-${partes[3]}T${String(hora).padStart(2, '0')}:${partes[5]}`;
+            };
+
+            // 2026-10-20: calendario compacto alineado encima del campo, como el diseño de referencia.
+            const crearMiniCalendarioFecha = (texto, nativo) => {
+                let mesVisible = new Date();
+                const popover = document.createElement('div');
+                popover.className = 'fecha-mini-calendario';
+                popover.setAttribute('role', 'dialog');
+                popover.setAttribute('aria-label', 'Seleccionar fecha');
+                document.body.appendChild(popover);
+                const claveFecha = (fecha) => `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`;
+                const fechaSeleccionada = () => (nativo.value || textoComoFechaHora(texto.value)).slice(0, 10);
+                const dibujar = () => {
+                    const anio = mesVisible.getFullYear();
+                    const mes = mesVisible.getMonth();
+                    const tituloMes = new Intl.DateTimeFormat('es-BO', { month: 'long', year: 'numeric' }).format(new Date(anio, mes, 1));
+                    const seleccion = fechaSeleccionada();
+                    const hoy = claveFecha(new Date());
+                    const inicio = new Date(anio, mes, 1).getDay();
+                    const diasMes = new Date(anio, mes + 1, 0).getDate();
+                    const cantidad = Math.ceil((inicio + diasMes) / 7) * 7;
+                    popover.innerHTML = `<div class="fecha-mini-cal-header"><button type="button" class="fecha-mini-nav" data-mes="-1" aria-label="Mes anterior">‹</button><span class="fecha-mini-mes">${tituloMes}</span><button type="button" class="fecha-mini-nav" data-mes="1" aria-label="Mes siguiente">›</button></div><div class="fecha-mini-grid">${['DO','LU','MA','MI','JU','VI','SA'].map(d => `<span class="fecha-mini-semana">${d}</span>`).join('')}</div><div class="fecha-mini-grid fecha-mini-dias"></div>`;
+                    const dias = popover.querySelector('.fecha-mini-dias');
+                    for (let indice = 0; indice < cantidad; indice++) {
+                        const fecha = new Date(anio, mes, indice - inicio + 1);
+                        const boton = document.createElement('button');
+                        boton.type = 'button';
+                        boton.className = 'fecha-mini-dia';
+                        boton.textContent = fecha.getDate();
+                        boton.dataset.fecha = claveFecha(fecha);
+                        if (fecha.getMonth() !== mes) boton.classList.add('otro-mes');
+                        if (boton.dataset.fecha === hoy) boton.classList.add('hoy');
+                        if (boton.dataset.fecha === seleccion) boton.classList.add('seleccionado');
+                        dias.appendChild(boton);
+                    }
+                };
+                const posicionar = () => {
+                    const rect = texto.getBoundingClientRect();
+                    popover.style.visibility = 'hidden';
+                    popover.classList.add('is-open');
+                    const ancho = popover.offsetWidth;
+                    const alto = popover.offsetHeight;
+                    const izquierda = Math.max(8, Math.min(rect.left, window.innerWidth - ancho - 8));
+                    let arriba = rect.top - alto - 4;
+                    if (arriba < 8) arriba = Math.min(window.innerHeight - alto - 8, rect.bottom + 4);
+                    popover.style.left = izquierda + 'px';
+                    popover.style.top = Math.max(8, arriba) + 'px';
+                    popover.style.visibility = '';
+                };
+                const abrir = () => {
+                    const valor = fechaSeleccionada();
+                    const base = valor ? new Date(valor + 'T12:00:00') : new Date();
+                    mesVisible = new Date(base.getFullYear(), base.getMonth(), 1);
+                    dibujar();
+                    posicionar();
+                };
+                const cerrar = () => popover.classList.remove('is-open');
+                const actualizar = () => { if (popover.classList.contains('is-open')) { dibujar(); posicionar(); } };
+                popover.addEventListener('click', (evento) => {
+                    evento.stopPropagation();
+                    const navegacion = evento.target.closest('[data-mes]');
+                    if (navegacion) {
+                        mesVisible.setMonth(mesVisible.getMonth() + Number(navegacion.dataset.mes));
+                        dibujar();
+                        posicionar();
+                        return;
+                    }
+                    const dia = evento.target.closest('[data-fecha]');
+                    if (!dia) return;
+                    const hora = nativo.value ? nativo.value.slice(11, 16) : '08:30';
+                    nativo.value = `${dia.dataset.fecha}T${hora}`;
+                    texto.value = fechaHoraComoTexto(nativo.value);
+                    texto.setCustomValidity('');
+                    cerrar();
+                    texto.focus();
+                });
+                document.addEventListener('click', (evento) => {
+                    if (evento.target !== texto && !popover.contains(evento.target)) cerrar();
+                });
+                window.addEventListener('scroll', cerrar, true);
+                window.addEventListener('resize', cerrar);
+                return { abrir, actualizar };
+            };
+
+            document.querySelectorAll('input[type="datetime-local"]').forEach((nativo) => {
+                if (nativo.dataset.formatoPreparado) return;
+                nativo.dataset.formatoPreparado = 'true';
+                const eraRequerido = nativo.required;
+                const contenedor = document.createElement('div');
+                contenedor.className = 'fecha-hora-control';
+                nativo.parentNode.insertBefore(contenedor, nativo);
+                contenedor.appendChild(nativo);
+
+                const texto = document.createElement('input');
+                texto.type = 'text';
+                texto.className = 'fecha-hora-texto';
+                texto.placeholder = 'AAAA/MM/DD HH:mm';
+                texto.autocomplete = 'off';
+                texto.inputMode = 'numeric';
+                texto.setAttribute('aria-label', 'Fecha y hora, formato año/mes/día hora:minutos');
+                texto.required = eraRequerido;
+                texto.value = fechaHoraComoTexto(nativo.value);
+                const calendarioFecha = crearMiniCalendarioFecha(texto, nativo);
+                nativo._calendarioFecha = calendarioFecha;
+                texto.addEventListener('input', () => {
+                    const valor = textoComoFechaHora(texto.value);
+                    nativo.value = valor;
+                    texto.setCustomValidity(texto.value && !valor ? 'Use AAAA/MM/DD H:mm o HH:mm, por ejemplo 2026/10/22 8:30.' : (texto.required && !valor ? 'Ingrese fecha y hora.' : ''));
+                    calendarioFecha.actualizar();
+                });
+                texto.addEventListener('click', calendarioFecha.abrir);
+                texto.addEventListener('blur', () => {
+                    const valor = textoComoFechaHora(texto.value);
+                    if (valor) texto.value = fechaHoraComoTexto(valor);
+                });
+                contenedor.insertBefore(texto, nativo);
+                nativo.required = false;
+                nativo.classList.add('fecha-hora-valor');
+            });
+
             const tabla = document.getElementById('tabla-dinamica');
             const menuColumnas = document.getElementById('menu-columnas');
             const btnColumnas = document.getElementById('btn-columnas');

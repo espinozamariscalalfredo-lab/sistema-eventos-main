@@ -1,5 +1,7 @@
+{{-- FRONTEND. 20/10/2026: pantalla de calendario, vista Disponible, filtros y formularios. --}}
 {{-- Cambio al español: 12/10/2026. La vista usa nombres de reservas y campos en español. --}}
 <x-app-layout>
+    {{-- LIBRERÍAS. 20/10/2026: FullCalendar, idioma español, Font Awesome y SweetAlert. --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
@@ -7,6 +9,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
+        /* ESTILOS. 20/10/2026: diseño del calendario, eventos, formularios y vista Disponible. */
+        /* Calendario: encabezados, carriles, eventos y modo oscuro. */
         .fc .fc-toolbar { display: none !important; }
         .fc-theme-standard th, .fc-theme-standard td { border-color: #e2e8f0; }
         .fc-theme-standard th { border-top: none !important; padding-bottom: 8px; border-left: none !important; border-right: none !important; }
@@ -17,6 +21,7 @@
             display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; margin: 3px; padding: 0 6px; border-radius: 9999px; background-color: #2563eb; color: #fff !important; font-weight: 700;
         }
         
+        /* Vista día/semana: líneas de horario y contenido de las reservas. */
         .fc-timegrid-axis-cushion { display: none !important; }
         .fc-timegrid-slot-label-cushion { font-size: 0.8rem; color: #475b75; }
         .fc-reserva-contenido { width: 100%; overflow: hidden; white-space: normal; overflow-wrap: anywhere; line-height: 1.12; }
@@ -29,6 +34,7 @@
         .fc-reserva-titulo { font-weight: 600; }
         .fc-reserva-detalle { font-size: 0.92em; }
         
+        /* Vista mes: tarjetas de eventos dentro de cada día. */
         .fc-dayGridMonth-view .fc-event { border-radius: 99px !important; border: none !important; margin-bottom: 2px !important; overflow: hidden; box-shadow: none !important; }
         .fc-dayGridMonth-view .fc-event-main { padding: 2px 6px !important; display: flex; align-items: center; }
         .fc-dayGridMonth-view .fc-reserva-contenido { display: flex; flex-direction: row; align-items: center; width: 100%; gap: 4px; line-height: 1; }
@@ -47,6 +53,7 @@
 
         .salones-calendar-scroll { overflow-x: auto; min-height: 600px; }
 
+        /* Mini calendario y leyenda de salones. */
         .mini-cal { width: 100%; text-align: center; font-size: 13px; border-collapse: separate; border-spacing: 2px; }
         .mini-cal th { color: #9ca3af; font-weight: normal; font-size: 12px; padding-bottom: 4px; }
         .mini-cal td { padding: 5px 0; border-radius: 4px; cursor: pointer; color: #4b5563; font-weight: 500; transition: background 0.2s; background-color: #ffffff; }
@@ -84,15 +91,58 @@
         .fecha-hora-texto { box-sizing: border-box; width: 100%; min-width: 0; flex: 1; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 4px; padding: 8px 12px; font: inherit; font-size: 13px; color: #1e293b; outline: none; }
         .fecha-hora-control:focus-within .fecha-hora-texto { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, .12); }
         .fecha-hora-valor { position: absolute; left: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
-        .fecha-selector-nativo { position: absolute; top: 0; right: 0; width: 40px; height: 100%; opacity: 0; cursor: pointer; }
+        /* Minicalendario propio: evita el selector grande que dibuja cada navegador. */
+        .fecha-mini-calendario { display: none; position: fixed; z-index: 10000; box-sizing: border-box; width: 194px; padding: 6px; border: 1px solid #cbd5e1; border-radius: 5px; background: #fff; color: #334155; box-shadow: 0 5px 14px rgba(15, 23, 42, .2); font: 12px Arial, sans-serif; }
+        .fecha-mini-calendario.is-open { display: block; }
+        .fecha-mini-cal-header { display: flex; align-items: center; justify-content: space-between; height: 24px; margin-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+        .fecha-mini-mes { flex: 1; text-align: center; font-weight: 700; text-transform: lowercase; }
+        .fecha-mini-nav { width: 24px; height: 22px; padding: 0; border: 0; background: transparent; color: #2563eb; font-size: 19px; line-height: 20px; cursor: pointer; }
+        .fecha-mini-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; text-align: center; }
+        .fecha-mini-semana { padding: 3px 0; color: #334155; font-weight: 700; }
+        .fecha-mini-dia { height: 22px; padding: 0; border: 1px solid transparent; border-radius: 2px; background: transparent; color: #1e293b; font: inherit; cursor: pointer; }
+        .fecha-mini-dia:hover { background: #dbeafe; }
+        .fecha-mini-dia.otro-mes { color: #94a3b8; }
+        .fecha-mini-dia.hoy { border-color: #2563eb; }
+        .fecha-mini-dia.seleccionado { background: #2563eb; color: #fff; }
 
-        /* Estilos para la tabla personalizada "Disponible" */
-        .tabla-disponible th { padding: 12px 8px; font-weight: bold; color: #475b75; font-size: 12px; text-align: center; line-height: 1.2; white-space: normal; max-width: 100px; }
-        .tabla-disponible td { padding: 12px 8px; text-align: center; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #64748b; }
+        /* 2026-10-20: compacta día, semana y mes; conserva las marcas de hora y media hora. */
+        .salones-calendar-scroll { width: 100%; overscroll-behavior-x: contain; }
+        .fc-timegrid-slot { height: 1.5em !important; }
+        .fc-timegrid-slot-label { padding: 1px 3px !important; }
+        .fc-timegrid-slot-label-cushion { font-size: 0.72rem; }
+        .fc-timegrid-event { font-size: 10px; }
+        .fc-timegrid-event .fc-event-main { padding: 1px 2px !important; }
+        .fc-dayGridMonth-view .fc-event-main { padding: 1px 4px !important; }
+        .fc-dayGridMonth-view .fc-event { margin-bottom: 1px !important; }
+        .fc-dayGridMonth-view .fc-reserva-contenido { gap: 2px; }
+        .fc-dayGridMonth-view .fc-reserva-hora, .fc-dayGridMonth-view .fc-reserva-titulo { font-size: 9px; }
+        .fc-timegrid .fc-col-header-cell-cushion > div:nth-child(2) { font-size: 1.3rem !important; }
+
+        /* Vista Disponible: tabla compacta para mostrar más salones en pantalla. */
+        /* 2026-10-20: se redujeron fuente, anchos y espacios interiores. */
+        .tabla-disponible { width: 100%; min-width: 0; table-layout: fixed; border-collapse: collapse; }
+        .tabla-disponible th { padding: 6px 3px !important; font-weight: bold; color: #475b75; font-size: 10px; text-align: center; line-height: 1.15; white-space: normal; overflow-wrap: anywhere; }
+        .tabla-disponible td { padding: 5px 3px !important; text-align: center; border-bottom: 1px solid #e2e8f0; font-size: 11px; color: #64748b; }
+        .tabla-disponible th:nth-child(1), .tabla-disponible td:nth-child(1) { width: 120px !important; }
+        .tabla-disponible th:nth-child(2), .tabla-disponible td:nth-child(2) { width: 16px !important; }
+        .tabla-disponible th:nth-child(3), .tabla-disponible td:nth-child(3) { width: 65px !important; }
+        .tabla-disponible th:nth-child(4), .tabla-disponible td:nth-child(4) { width: 26px !important; }
+        .tabla-disponible td:nth-child(n+5) { overflow-wrap: anywhere; }
+        @media (max-width: 900px) {
+            .tabla-disponible { min-width: 760px; }
+            .tabla-disponible th { font-size: 9px; }
+            .tabla-disponible td { font-size: 10px; }
+        }
         .tabla-disponible tr:hover { background-color: #f8fafc; }
+        @media (max-width: 640px) {
+            .salones-calendar-scroll { overflow-x: auto; }
+            .fc-dayGridMonth-view .fc-reserva-hora, .fc-dayGridMonth-view .fc-reserva-titulo { font-size: 8px; }
+            .fc-timegrid-event { font-size: 9px; }
+        }
         .celda-vacia:hover { background-color: #e2e8f0; border-radius: 4px; cursor: pointer; color: #3b82f6; font-weight: bold; }
     </style>
 
+    <!-- HTML/BLADE del frontend. Las rutas y reglas del servidor están en routes/ y app/. -->
     <div class="min-h-screen bg-white py-6 px-4 sm:px-8">
         <div style="max-width: 1400px; margin: 0 auto;">
             
@@ -595,7 +645,7 @@
         </div>
     </div>
 
-    <!-- SCRIPTS -->
+    <!-- JavaScript frontend. 20/10/2026: conecta calendario, filtros y formularios con rutas Laravel. -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
@@ -607,13 +657,105 @@
             }
 
             function valorFechaHora(texto) {
-                var coincidencia = String(texto || '').trim().match(/^(\d{4})\/(\d{2})\/(\d{2})\s+(\d{2}):(\d{2})$/);
+                var coincidencia = String(texto || '').trim().match(/^(\d{4})\/(\d{2})\/(\d{2})\s+(\d{1,2}):(\d{2})$/);
                 if (!coincidencia) return '';
 
-                var fecha = new Date(Number(coincidencia[1]), Number(coincidencia[2]) - 1, Number(coincidencia[3]), Number(coincidencia[4]), Number(coincidencia[5]));
-                if (fecha.getFullYear() !== Number(coincidencia[1]) || fecha.getMonth() !== Number(coincidencia[2]) - 1 || fecha.getDate() !== Number(coincidencia[3]) || fecha.getHours() !== Number(coincidencia[4]) || fecha.getMinutes() !== Number(coincidencia[5])) return '';
+                var hora = Number(coincidencia[4]);
+                var minuto = Number(coincidencia[5]);
+                var fecha = new Date(Number(coincidencia[1]), Number(coincidencia[2]) - 1, Number(coincidencia[3]), hora, minuto);
+                if (fecha.getFullYear() !== Number(coincidencia[1]) || fecha.getMonth() !== Number(coincidencia[2]) - 1 || fecha.getDate() !== Number(coincidencia[3]) || fecha.getHours() !== hora || fecha.getMinutes() !== minuto || hora > 23 || minuto > 59) return '';
 
-                return `${coincidencia[1]}-${coincidencia[2]}-${coincidencia[3]}T${coincidencia[4]}:${coincidencia[5]}`;
+                return `${coincidencia[1]}-${coincidencia[2]}-${coincidencia[3]}T${String(hora).padStart(2, '0')}:${coincidencia[5]}`;
+            }
+
+            // 2026-10-20: calendario compacto de 194 px, con semana de domingo a sábado.
+            function crearMiniCalendarioFecha(contenedor, texto, nativo) {
+                var mesVisible = new Date();
+                var popover = document.createElement('div');
+                popover.className = 'fecha-mini-calendario';
+                popover.setAttribute('role', 'dialog');
+                popover.setAttribute('aria-label', 'Seleccionar fecha');
+                document.body.appendChild(popover);
+
+                function claveFecha(fecha) {
+                    return `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`;
+                }
+                function fechaSeleccionada() {
+                    var valor = nativo.value || valorFechaHora(texto.value);
+                    return valor ? valor.slice(0, 10) : '';
+                }
+                function dibujar() {
+                    var anio = mesVisible.getFullYear();
+                    var mes = mesVisible.getMonth();
+                    var tituloMes = new Intl.DateTimeFormat('es-BO', { month: 'long', year: 'numeric' }).format(new Date(anio, mes, 1));
+                    var seleccion = fechaSeleccionada();
+                    var hoy = claveFecha(new Date());
+                    var inicio = new Date(anio, mes, 1).getDay();
+                    var diasMes = new Date(anio, mes + 1, 0).getDate();
+                    var cantidad = Math.ceil((inicio + diasMes) / 7) * 7;
+
+                    popover.innerHTML = `<div class="fecha-mini-cal-header"><button type="button" class="fecha-mini-nav" data-mes="-1" aria-label="Mes anterior">‹</button><span class="fecha-mini-mes">${tituloMes}</span><button type="button" class="fecha-mini-nav" data-mes="1" aria-label="Mes siguiente">›</button></div><div class="fecha-mini-grid">${['DO','LU','MA','MI','JU','VI','SA'].map(d => `<span class="fecha-mini-semana">${d}</span>`).join('')}</div><div class="fecha-mini-grid fecha-mini-dias"></div>`;
+                    var dias = popover.querySelector('.fecha-mini-dias');
+                    for (var indice = 0; indice < cantidad; indice++) {
+                        var fecha = new Date(anio, mes, indice - inicio + 1);
+                        var boton = document.createElement('button');
+                        boton.type = 'button';
+                        boton.className = 'fecha-mini-dia';
+                        boton.textContent = fecha.getDate();
+                        boton.dataset.fecha = claveFecha(fecha);
+                        if (fecha.getMonth() !== mes) boton.classList.add('otro-mes');
+                        if (boton.dataset.fecha === hoy) boton.classList.add('hoy');
+                        if (boton.dataset.fecha === seleccion) boton.classList.add('seleccionado');
+                        dias.appendChild(boton);
+                    }
+                }
+                function posicionar() {
+                    var rect = texto.getBoundingClientRect();
+                    popover.style.visibility = 'hidden';
+                    popover.classList.add('is-open');
+                    var ancho = popover.offsetWidth;
+                    var alto = popover.offsetHeight;
+                    var izquierda = Math.max(8, Math.min(rect.left, window.innerWidth - ancho - 8));
+                    var arriba = rect.top - alto - 4;
+                    if (arriba < 8) arriba = Math.min(window.innerHeight - alto - 8, rect.bottom + 4);
+                    popover.style.left = izquierda + 'px';
+                    popover.style.top = Math.max(8, arriba) + 'px';
+                    popover.style.visibility = '';
+                }
+                function abrir() {
+                    var valor = fechaSeleccionada();
+                    var base = valor ? new Date(valor + 'T12:00:00') : new Date();
+                    mesVisible = new Date(base.getFullYear(), base.getMonth(), 1);
+                    dibujar();
+                    posicionar();
+                }
+                function cerrar() { popover.classList.remove('is-open'); }
+                function actualizar() { if (popover.classList.contains('is-open')) { dibujar(); posicionar(); } }
+
+                popover.addEventListener('click', function(evento) {
+                    evento.stopPropagation();
+                    var navegacion = evento.target.closest('[data-mes]');
+                    if (navegacion) {
+                        mesVisible.setMonth(mesVisible.getMonth() + Number(navegacion.dataset.mes));
+                        dibujar();
+                        posicionar();
+                        return;
+                    }
+                    var dia = evento.target.closest('[data-fecha]');
+                    if (!dia) return;
+                    var horaActual = nativo.value ? nativo.value.slice(11, 16) : '08:30';
+                    nativo.value = dia.dataset.fecha + 'T' + horaActual;
+                    texto.value = formatoFechaHora(nativo.value);
+                    texto.setCustomValidity('');
+                    cerrar();
+                    texto.focus();
+                });
+                document.addEventListener('click', function(evento) {
+                    if (evento.target !== texto && !popover.contains(evento.target)) cerrar();
+                });
+                window.addEventListener('scroll', cerrar, true);
+                window.addEventListener('resize', cerrar);
+                return { abrir: abrir, cerrar: cerrar, actualizar: actualizar };
             }
 
             function prepararCamposFechaHora() {
@@ -642,37 +784,23 @@
                     nativo.required = false;
                     nativo.classList.add('fecha-hora-valor');
 
-                    var selectorFecha = document.createElement('input');
-                    selectorFecha.type = 'date';
-                    selectorFecha.className = 'fecha-selector-nativo';
-                    selectorFecha.value = nativo.value ? nativo.value.slice(0, 10) : '';
-                    selectorFecha.setAttribute('aria-label', 'Abrir selector de fecha');
-                    contenedor.appendChild(selectorFecha);
+                    var calendarioFecha = crearMiniCalendarioFecha(contenedor, texto, nativo);
+                    nativo._calendarioFecha = calendarioFecha;
 
                     function actualizarDesdeTexto() {
                         var valor = valorFechaHora(texto.value);
                         nativo.value = valor;
-                        selectorFecha.value = valor ? valor.slice(0, 10) : '';
                         texto.setCustomValidity(texto.value && !valor
-                            ? 'Use el formato AAAA/MM/DD HH:mm, por ejemplo 2026/10/22 16:30.'
+                            ? 'Use AAAA/MM/DD H:mm o HH:mm, por ejemplo 2026/10/22 8:30.'
                             : (texto.required && !valor ? 'Ingrese una fecha y hora.' : ''));
+                        calendarioFecha.actualizar();
                     }
 
                     texto.addEventListener('input', actualizarDesdeTexto);
-                    texto.addEventListener('click', function() {
-                        try {
-                            if (selectorFecha.showPicker) selectorFecha.showPicker();
-                            else selectorFecha.focus();
-                        } catch (error) {
-                            selectorFecha.focus();
-                        }
-                    });
-                    selectorFecha.addEventListener('change', function() {
-                        if (!selectorFecha.value) return;
-                        var horaActual = nativo.value ? nativo.value.slice(11, 16) : '00:00';
-                        nativo.value = selectorFecha.value + 'T' + horaActual;
-                        texto.value = formatoFechaHora(nativo.value);
-                        texto.setCustomValidity('');
+                    texto.addEventListener('click', calendarioFecha.abrir);
+                    texto.addEventListener('blur', function() {
+                        var valor = valorFechaHora(texto.value);
+                        if (valor) texto.value = formatoFechaHora(valor);
                     });
                 });
             }
@@ -686,8 +814,7 @@
                     texto.value = formatoFechaHora(nativo.value);
                     texto.setCustomValidity('');
                 }
-                var selectorFecha = nativo.parentNode.querySelector('.fecha-selector-nativo');
-                if (selectorFecha) selectorFecha.value = nativo.value ? nativo.value.slice(0, 10) : '';
+                if (nativo._calendarioFecha) nativo._calendarioFecha.actualizar();
             }
 
             function leerFechaHora(id) {
@@ -698,8 +825,7 @@
                     nativo.value = valorFechaHora(texto.value);
                     texto.setCustomValidity(texto.value && !nativo.value ? 'Use el formato AAAA/MM/DD HH:mm.' : '');
                 }
-                var selectorFecha = nativo.parentNode.querySelector('.fecha-selector-nativo');
-                if (selectorFecha) selectorFecha.value = nativo.value ? nativo.value.slice(0, 10) : '';
+                if (nativo._calendarioFecha) nativo._calendarioFecha.actualizar();
                 return nativo.value;
             }
 

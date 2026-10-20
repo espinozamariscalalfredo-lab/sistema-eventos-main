@@ -1,5 +1,6 @@
 <?php
 
+// BACKEND/DATOS. 20/10/2026: conexiones y esquema PostgreSQL; secretos vienen de .env.
 use Illuminate\Support\Str;
 
 return [
