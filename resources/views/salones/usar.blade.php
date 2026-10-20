@@ -80,6 +80,11 @@
         .fc-reserva-estado-cancelado { display: inline-flex; align-items: center; flex: 0 0 auto; padding: 2px 7px; border: 1px solid #fecaca; border-radius: 999px; background: #dc2626; color: #fff; font-size: 9px; font-weight: 700; line-height: 1.2; vertical-align: middle; box-shadow: 0 1px 2px rgba(127,29,29,.25); }
         .fc-timeGridDay-view .fc-reserva-titulo { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
         .fc-timegrid-event, .fc-timegrid-event .fc-event-main { overflow: visible !important; }
+        .fecha-hora-control { position: relative; display: flex; flex: 1; min-width: 0; }
+        .fecha-hora-texto { box-sizing: border-box; width: 100%; min-width: 0; flex: 1; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 4px; padding: 8px 12px; font: inherit; font-size: 13px; color: #1e293b; outline: none; }
+        .fecha-hora-control:focus-within .fecha-hora-texto { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, .12); }
+        .fecha-hora-valor { position: absolute; left: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+        .fecha-selector-nativo { position: absolute; top: 0; right: 0; width: 40px; height: 100%; opacity: 0; cursor: pointer; }
 
         /* Estilos para la tabla personalizada "Disponible" */
         .tabla-disponible th { padding: 12px 8px; font-weight: bold; color: #475b75; font-size: 12px; text-align: center; line-height: 1.2; white-space: normal; max-width: 100px; }
@@ -594,6 +599,111 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
+
+            // Muestra fecha local legible y conserva el selector nativo del navegador (20/10/2026).
+            function formatoFechaHora(valor) {
+                var coincidencia = String(valor || '').match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}:\d{2})/);
+                return coincidencia ? `${coincidencia[1]}/${coincidencia[2]}/${coincidencia[3]} ${coincidencia[4]}` : '';
+            }
+
+            function valorFechaHora(texto) {
+                var coincidencia = String(texto || '').trim().match(/^(\d{4})\/(\d{2})\/(\d{2})\s+(\d{2}):(\d{2})$/);
+                if (!coincidencia) return '';
+
+                var fecha = new Date(Number(coincidencia[1]), Number(coincidencia[2]) - 1, Number(coincidencia[3]), Number(coincidencia[4]), Number(coincidencia[5]));
+                if (fecha.getFullYear() !== Number(coincidencia[1]) || fecha.getMonth() !== Number(coincidencia[2]) - 1 || fecha.getDate() !== Number(coincidencia[3]) || fecha.getHours() !== Number(coincidencia[4]) || fecha.getMinutes() !== Number(coincidencia[5])) return '';
+
+                return `${coincidencia[1]}-${coincidencia[2]}-${coincidencia[3]}T${coincidencia[4]}:${coincidencia[5]}`;
+            }
+
+            function prepararCamposFechaHora() {
+                document.querySelectorAll('input[type="datetime-local"]').forEach(function(nativo) {
+                    if (nativo.dataset.formatoPreparado) return;
+                    nativo.dataset.formatoPreparado = 'true';
+                    var eraRequerido = nativo.required;
+                    var contenedor = document.createElement('div');
+                    contenedor.className = 'fecha-hora-control';
+                    contenedor.style.flex = nativo.id === 'filtro-gap-fecha' ? '0 0 160px' : '0 1 190px';
+                    nativo.parentNode.insertBefore(contenedor, nativo);
+                    contenedor.appendChild(nativo);
+
+                    var texto = document.createElement('input');
+                    texto.type = 'text';
+                    texto.className = 'fecha-hora-texto';
+                    texto.placeholder = 'AAAA/MM/DD HH:mm';
+                    texto.autocomplete = 'off';
+                    texto.inputMode = 'numeric';
+                    texto.setAttribute('aria-label', 'Fecha y hora, formato año/mes/día hora:minutos');
+                    texto.required = eraRequerido;
+                    texto.value = formatoFechaHora(nativo.value);
+                    texto.dataset.fechaHoraPara = nativo.id;
+                    contenedor.insertBefore(texto, nativo);
+
+                    nativo.required = false;
+                    nativo.classList.add('fecha-hora-valor');
+
+                    var selectorFecha = document.createElement('input');
+                    selectorFecha.type = 'date';
+                    selectorFecha.className = 'fecha-selector-nativo';
+                    selectorFecha.value = nativo.value ? nativo.value.slice(0, 10) : '';
+                    selectorFecha.setAttribute('aria-label', 'Abrir selector de fecha');
+                    contenedor.appendChild(selectorFecha);
+
+                    function actualizarDesdeTexto() {
+                        var valor = valorFechaHora(texto.value);
+                        nativo.value = valor;
+                        selectorFecha.value = valor ? valor.slice(0, 10) : '';
+                        texto.setCustomValidity(texto.value && !valor
+                            ? 'Use el formato AAAA/MM/DD HH:mm, por ejemplo 2026/10/22 16:30.'
+                            : (texto.required && !valor ? 'Ingrese una fecha y hora.' : ''));
+                    }
+
+                    texto.addEventListener('input', actualizarDesdeTexto);
+                    texto.addEventListener('click', function() {
+                        try {
+                            if (selectorFecha.showPicker) selectorFecha.showPicker();
+                            else selectorFecha.focus();
+                        } catch (error) {
+                            selectorFecha.focus();
+                        }
+                    });
+                    selectorFecha.addEventListener('change', function() {
+                        if (!selectorFecha.value) return;
+                        var horaActual = nativo.value ? nativo.value.slice(11, 16) : '00:00';
+                        nativo.value = selectorFecha.value + 'T' + horaActual;
+                        texto.value = formatoFechaHora(nativo.value);
+                        texto.setCustomValidity('');
+                    });
+                });
+            }
+
+            function establecerFechaHora(id, valor) {
+                var nativo = document.getElementById(id);
+                if (!nativo) return;
+                nativo.value = String(valor || '').slice(0, 16);
+                var texto = document.querySelector('[data-fecha-hora-para="' + id + '"]');
+                if (texto) {
+                    texto.value = formatoFechaHora(nativo.value);
+                    texto.setCustomValidity('');
+                }
+                var selectorFecha = nativo.parentNode.querySelector('.fecha-selector-nativo');
+                if (selectorFecha) selectorFecha.value = nativo.value ? nativo.value.slice(0, 10) : '';
+            }
+
+            function leerFechaHora(id) {
+                var nativo = document.getElementById(id);
+                var texto = document.querySelector('[data-fecha-hora-para="' + id + '"]');
+                if (!nativo) return '';
+                if (texto) {
+                    nativo.value = valorFechaHora(texto.value);
+                    texto.setCustomValidity(texto.value && !nativo.value ? 'Use el formato AAAA/MM/DD HH:mm.' : '');
+                }
+                var selectorFecha = nativo.parentNode.querySelector('.fecha-selector-nativo');
+                if (selectorFecha) selectorFecha.value = nativo.value ? nativo.value.slice(0, 10) : '';
+                return nativo.value;
+            }
+
+            prepararCamposFechaHora();
             var selectedSalonFilter = null;
             var miniEventDatesCache = {};
             var salonColors = @json($coloresSalones);
@@ -607,6 +717,16 @@
             var gapStartDate = null;
             var gapDurationMins = 60;
             var gapSalon = 'any';
+            // 2026-10-20: evita que una respuesta vieja de la API agregue filas tras cambiar la fecha.
+            var renderDisponibleId = 0;
+
+            var fechaDisponibleInicial = new Date();
+            fechaDisponibleInicial.setHours(8, 30, 0, 0);
+            var fechaDisponibleTexto = `${fechaDisponibleInicial.getFullYear()}-${String(fechaDisponibleInicial.getMonth() + 1).padStart(2, '0')}-${String(fechaDisponibleInicial.getDate()).padStart(2, '0')}T08:30`;
+            establecerFechaHora('filtro-gap-fecha', fechaDisponibleTexto);
+            document.getElementById('filtro-gap-minutos').value = '60';
+            gapFilterActive = true;
+            gapStartDate = fechaDisponibleInicial;
 
             function ajustarAnchoCarriles(viewType) {
                 if (viewType === 'dayGridMonth' || viewType === 'timeGridWeek') {
@@ -686,6 +806,7 @@
 
             // ======= FUNCIONALIDAD DE LA VISTA PERSONALIZADA "DISPONIBLE" =======
             function renderTablaDisponible() {
+                var renderId = ++renderDisponibleId;
                 var tbody = document.getElementById('cuerpo-disponible');
                 var thead = document.getElementById('cabecera-disponible');
                 var tituloVista = document.querySelector('#titulo-disponible');
@@ -723,6 +844,9 @@
                 fetch('/api/salones/reservas', { headers: { 'Accept': 'application/json' } })
                     .then(response => response.json())
                     .then(allEvents => {
+                        // Si hubo otra búsqueda mientras cargaban los datos, ignoramos esta respuesta anterior.
+                        if (renderId !== renderDisponibleId) return;
+
                         let sortedKeys = [];
                         let timeBlocks = {};
                         
@@ -855,7 +979,7 @@
                         }
 
                         // 4. GENERAR FILAS Y CELDAS
-                        sortedKeys.forEach(key => {
+                        sortedKeys.slice(0, 10).forEach(key => {
                             let block = timeBlocks[key];
                             let tr = document.createElement('tr');
 
@@ -890,8 +1014,8 @@
                                         let startFormatted = `${s.getFullYear()}-${String(s.getMonth()+1).padStart(2,'0')}-${String(s.getDate()).padStart(2,'0')}T${String(s.getHours()).padStart(2,'0')}:${String(s.getMinutes()).padStart(2,'0')}`;
                                         let endFormatted = `${e.getFullYear()}-${String(e.getMonth()+1).padStart(2,'0')}-${String(e.getDate()).padStart(2,'0')}T${String(e.getHours()).padStart(2,'0')}:${String(e.getMinutes()).padStart(2,'0')}`;
                                         
-                                        document.getElementById('modal-start').value = startFormatted;
-                                        document.getElementById('modal-end').value = endFormatted;
+                                        establecerFechaHora('modal-start', startFormatted);
+                                        establecerFechaHora('modal-end', endFormatted);
                                         
                                         let salonSelect = document.querySelector('#booking-modal select[name="salon"]');
                                         if (salonSelect) salonSelect.value = salonName;
@@ -911,8 +1035,8 @@
                 var props = evento.extendedProps;
 
                 document.getElementById('edit-event-id').value = evento.id;
-                document.getElementById('edit-start').value = evento.startStr.slice(0, 16);
-                document.getElementById('edit-end').value = evento.endStr ? evento.endStr.slice(0, 16) : '';
+                establecerFechaHora('edit-start', evento.startStr);
+                establecerFechaHora('edit-end', evento.endStr || '');
                 document.getElementById('edit-title').value = evento.title;
                 var selectorEstado = document.getElementById('edit-event-state');
                 if (selectorEstado) selectorEstado.value = props.estado || 'programado';
@@ -1162,8 +1286,8 @@
                     }
 
                     var modal = document.getElementById('booking-modal');
-                    document.getElementById('modal-start').value = info.startStr.slice(0, 16);
-                    document.getElementById('modal-end').value = info.endStr.slice(0, 16);
+                    establecerFechaHora('modal-start', info.startStr);
+                    establecerFechaHora('modal-end', info.endStr);
                     var salon = salonSeleccionadoEnCarril(info);
                     var salonSelect = modal.querySelector('select[name="salon"]');
                     if (salon && salonSelect && Array.from(salonSelect.options).some(function(option) { return option.value === salon; })) {
@@ -1296,13 +1420,13 @@
 
             // ACCIONES DEL BUSCADOR DE ESPACIOS
             document.getElementById('btn-buscar-gap').addEventListener('click', function() {
-                let fechaInput = document.getElementById('filtro-gap-fecha').value;
+                let fechaInput = leerFechaHora('filtro-gap-fecha');
                 if (!fechaInput) {
                     alert('Por favor, seleccione una fecha base para buscar.');
                     return;
                 }
                 gapFilterActive = true;
-                gapStartDate = new Date(fechaInput);
+                gapStartDate = new Date(Number(fechaInput.slice(0, 4)), Number(fechaInput.slice(5, 7)) - 1, Number(fechaInput.slice(8, 10)), Number(fechaInput.slice(11, 13)), Number(fechaInput.slice(14, 16)));
                 gapDurationMins = parseInt(document.getElementById('filtro-gap-minutos').value) || 60;
                 gapSalon = document.getElementById('filtro-gap-salon').value;
                 
@@ -1312,7 +1436,7 @@
             document.getElementById('btn-vaciar-gap').addEventListener('click', function(e) {
                 e.preventDefault();
                 gapFilterActive = false;
-                document.getElementById('filtro-gap-fecha').value = '';
+                establecerFechaHora('filtro-gap-fecha', '');
                 document.getElementById('filtro-gap-salon').value = 'any';
                 renderTablaDisponible();
             });
@@ -1489,7 +1613,27 @@
                             row.classList.add('mc-row-selected');
                         }
 
-                        td.addEventListener('click', function() { calendar.gotoDate(this.getAttribute('data-date')); });
+                        td.addEventListener('click', function() {
+                            var fechaElegida = this.getAttribute('data-date');
+                            calendar.gotoDate(fechaElegida);
+
+                            if (document.getElementById('vista-disponible-container').style.display === 'block') {
+                                var fechaActual = leerFechaHora('filtro-gap-fecha');
+                                var horaElegida = fechaActual ? fechaActual.slice(11, 16) : '08:30';
+                                establecerFechaHora('filtro-gap-fecha', fechaElegida + 'T' + horaElegida);
+                                gapStartDate = new Date(
+                                    Number(fechaElegida.slice(0, 4)),
+                                    Number(fechaElegida.slice(5, 7)) - 1,
+                                    Number(fechaElegida.slice(8, 10)),
+                                    Number(horaElegida.slice(0, 2)),
+                                    Number(horaElegida.slice(3, 5))
+                                );
+                                gapFilterActive = true;
+                                gapDurationMins = parseInt(document.getElementById('filtro-gap-minutos').value, 10) || 60;
+                                gapSalon = document.getElementById('filtro-gap-salon').value;
+                                renderTablaDisponible();
+                            }
+                        });
                         row.appendChild(td);
                     }
 
