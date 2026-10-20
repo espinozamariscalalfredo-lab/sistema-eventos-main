@@ -1,5 +1,6 @@
 <?php
 
+// BASE DE DATOS. 20/10/2026: genera cuentas ficticias para pruebas y desarrollo.
 namespace Database\Factories;
 
 use App\Models\Usuario;

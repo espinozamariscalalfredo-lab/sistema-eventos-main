@@ -2,7 +2,9 @@
 
 Aplicación Laravel para consultar el calendario, registrar reservas y administrar salones y cuentas. PostgreSQL es la única base de datos de la aplicación.
 
-> Guía revisada: 13/10/2026. La aplicación continúa ejecutándose como Laravel con vistas Blade.
+> Guía revisada: 20/10/2026. La aplicación continúa ejecutándose como Laravel con vistas Blade.
+
+Para estudiar el proyecto desde cero, empieza por [la guía de código para junior](docs/GUIA_DE_CODIGO_PARA_JUNIOR.md). Explica backend, frontend, estilos, librerías, Composer, npm y PostgreSQL con ejemplos de dónde seguir cada función.
 
 ## Cómo funciona una pantalla
 
@@ -71,6 +73,7 @@ Hoy las direcciones `/api/...` también están en `routes/web.php` y usan la ses
 
 - **13/10/2026:** se añadió una guía para una futura separación frontend/backend. No se movió código ejecutable; las rutas, vistas y conexión actual siguen iguales.
 - **13/10/2026:** se aclaró el recorrido del calendario para facilitar el mantenimiento por módulos.
+- **20/10/2026:** se agregó una guía de estudio con el mapa actual de archivos, capas, dependencias, base de datos y reglas para fechar comentarios.
 
 Al hacer un cambio futuro, agrega una línea aquí solo si afecta la estructura, la base de datos o el flujo de un módulo. En el código, coloca la fecha junto a la regla nueva o modificada, no en cada línea.
 

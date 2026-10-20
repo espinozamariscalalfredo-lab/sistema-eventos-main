@@ -1,5 +1,6 @@
 <?php
 
+// BASE DE DATOS. 20/10/2026: carga inicial y cuenta de demostración para desarrollo.
 namespace Database\Seeders;
 
 use App\Models\Usuario;

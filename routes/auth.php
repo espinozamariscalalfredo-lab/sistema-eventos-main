@@ -1,5 +1,7 @@
 <?php
 
+// FRONTEND/BACKEND: rutas del servidor para ingreso, registro y recuperación de cuenta.
+// 20/10/2026: se identifica este archivo para seguir las pantallas de acceso desde su URL.
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;

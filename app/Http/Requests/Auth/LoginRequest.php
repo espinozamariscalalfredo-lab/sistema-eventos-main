@@ -1,5 +1,6 @@
 <?php
 
+// BACKEND/AUTENTICACIÓN. 20/10/2026: valida y limita intentos del formulario de ingreso.
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Auth\Events\Lockout;

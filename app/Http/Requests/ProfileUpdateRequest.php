@@ -1,5 +1,6 @@
 <?php
 
+// BACKEND/VALIDACIÓN. 20/10/2026: reglas del formulario de perfil antes de guardar.
 namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
