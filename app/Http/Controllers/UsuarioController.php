@@ -15,10 +15,10 @@ class UsuarioController extends Controller
     // Carga cuentas y el catálogo visible para admin y superadmin.
     public function index()
     {
+        abort_unless(auth()->user()?->rol === 'superadmin', 403, 'Solo el superadministrador puede administrar las cuentas.');
+
         $usuarios = Usuario::orderBy('id')->get();
-        $salones = in_array(auth()->user()->rol, ['admin', 'superadmin'], true)
-            ? Salon::orderBy('orden')->orderBy('nombre')->get()
-            : collect();
+        $salones = Salon::orderBy('orden')->orderBy('nombre')->get();
 
         return view('salones.usuarios', compact('usuarios', 'salones'));
     }
@@ -26,7 +26,7 @@ class UsuarioController extends Controller
     // Crea una cuenta y guarda su contraseña cifrada.
     public function store(Request $request)
     {
-        if (auth()->user()->rol !== 'admin') abort(403, 'Acceso denegado.');
+        abort_unless(auth()->user()?->rol === 'superadmin', 403, 'Solo el superadministrador puede administrar las cuentas.');
 
         $request->validate([
             'nombre' => 'required|string|max:255',
@@ -52,7 +52,7 @@ class UsuarioController extends Controller
     // Actualiza los datos de una cuenta; la contraseña solo cambia si se envía una nueva.
     public function update(Request $request, $id)
     {
-        if (auth()->user()->rol !== 'admin') abort(403, 'Acceso denegado.');
+        abort_unless(auth()->user()?->rol === 'superadmin', 403, 'Solo el superadministrador puede administrar las cuentas.');
 
         $usuario = Usuario::findOrFail($id);
         
@@ -83,7 +83,7 @@ class UsuarioController extends Controller
     // Elimina una cuenta, excepto la cuenta que inició sesión.
     public function destroy($id)
     {
-        if (auth()->user()->rol !== 'admin') abort(403, 'Acceso denegado.');
+        abort_unless(auth()->user()?->rol === 'superadmin', 403, 'Solo el superadministrador puede administrar las cuentas.');
         
         // Evitar que el admin se borre a sí mismo por accidente
         if (auth()->id() == $id) {

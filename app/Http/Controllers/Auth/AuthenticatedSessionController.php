@@ -24,7 +24,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $destino = auth()->user()?->rol === 'superadmin'
+            ? route('dashboard', absolute: false)
+            : route('salones.usar', absolute: false);
+
+        return redirect()->intended($destino);
     }
 
     // Cierra sesión y renueva la sesión del navegador.

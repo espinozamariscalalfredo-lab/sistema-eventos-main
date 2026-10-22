@@ -245,6 +245,32 @@
                     {{ url('/salones/usar') }} <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 12px;"></i>
                 </a>
 
+                <form method="GET" action="{{ route('salones.supervisar') }}"
+                    style="display: flex; align-items: center; gap: 8px; width: min(100%, 620px); margin: 0 0 14px;">
+                    <input type="hidden" name="salon" value="{{ $salonSeleccionado }}">
+                    <input type="hidden" name="responsable" value="{{ $responsableSeleccionado }}">
+                    <input type="hidden" name="autoridad" value="{{ $autoridadSeleccionada }}">
+                    <input type="hidden" name="fecha" value="{{ $fechaSeleccionada }}">
+
+                    <label for="buscar-reservas" style="color: #475b75; font-size: 13px; font-weight: 600; white-space: nowrap;">
+                        Buscar:
+                    </label>
+                    <input id="buscar-reservas" type="search" name="buscar" value="{{ $buscar }}"
+                        maxlength="100" placeholder="Salón, fecha, evento, autoridad, responsable..."
+                        style="flex: 1; min-width: 180px; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 5px; color: #334155;">
+                    <button type="submit"
+                        style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; border: 0; border-radius: 5px; background: #2563eb; color: #fff; cursor: pointer;">
+                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                        Buscar
+                    </button>
+                    @if($buscar !== '' || !empty($salonSeleccionado) || !empty($responsableSeleccionado) || !empty($autoridadSeleccionada) || !empty($fechaSeleccionada))
+                        <a href="{{ route('salones.supervisar') }}"
+                            style="color: #64748b; font-size: 13px; text-decoration: none; white-space: nowrap;">
+                            Limpiar
+                        </a>
+                    @endif
+                </form>
+
                 <!-- Panel de Herramientas Dinámicas -->
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
                     
@@ -255,6 +281,11 @@
                             action="{{ route('salones.supervisar') }}"
                             class="supervisar-filtro-form"
                             style="display: flex; align-items: center; gap: 6px;">
+
+                            <input type="hidden" name="responsable" value="{{ $responsableSeleccionado }}">
+                            <input type="hidden" name="autoridad" value="{{ $autoridadSeleccionada }}">
+                            <input type="hidden" name="fecha" value="{{ $fechaSeleccionada }}">
+                            <input type="hidden" name="buscar" value="{{ $buscar }}">
 
                             <label for="filtro-salon-supervisar"
                                 style="color: #4b5563;">
@@ -275,7 +306,7 @@
                                     Todos
                                 </option>
 
-                                @foreach($salones as $salon)
+                                @foreach($salonesFiltro as $salon)
                                     <option value="{{ $salon->nombre }}"
                                         {{ $salonSeleccionado === $salon->nombre ? 'selected' : '' }}>
                                         {{ $salon->nombre }}
@@ -293,6 +324,11 @@
                             action="{{ route('salones.supervisar') }}"
                             class="supervisar-filtro-form"
                             style="display: flex; align-items: center; gap: 6px;">
+
+                            <input type="hidden" name="salon" value="{{ $salonSeleccionado }}">
+                            <input type="hidden" name="autoridad" value="{{ $autoridadSeleccionada }}">
+                            <input type="hidden" name="fecha" value="{{ $fechaSeleccionada }}">
+                            <input type="hidden" name="buscar" value="{{ $buscar }}">
 
                             <label for="filtro-responsable-supervisar"
                                 style="color: #4b5563; white-space: nowrap;">
@@ -318,6 +354,49 @@
                                     <option value="{{ $responsable }}"
                                         {{ $responsableSeleccionado === $responsable ? 'selected' : '' }}>
                                         {{ $responsable }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <noscript>
+                                <button type="submit">Filtrar</button>
+                            </noscript>
+                        </form>
+
+                        <form method="GET"
+                            action="{{ route('salones.supervisar') }}"
+                            class="supervisar-filtro-form"
+                            style="display: flex; align-items: center; gap: 6px;">
+
+                            <input type="hidden" name="salon" value="{{ $salonSeleccionado }}">
+                            <input type="hidden" name="responsable" value="{{ $responsableSeleccionado }}">
+                            <input type="hidden" name="fecha" value="{{ $fechaSeleccionada }}">
+                            <input type="hidden" name="buscar" value="{{ $buscar }}">
+
+                            <label for="filtro-autoridad-supervisar"
+                                style="color: #4b5563; white-space: nowrap;">
+                                Autoridad:
+                            </label>
+
+                            <select id="filtro-autoridad-supervisar"
+                                    name="autoridad"
+                                    onchange="this.form.submit()"
+                                    style="border: 1px solid #d1d5db;
+                                        border-radius: 4px;
+                                        padding: 4px 8px;
+                                        font-size: 13px;
+                                        color: #374151;
+                                        max-width: 230px;">
+
+                                <option value=""
+                                    {{ empty($autoridadSeleccionada) ? 'selected' : '' }}>
+                                    Todas
+                                </option>
+
+                                @foreach($autoridades as $autoridad)
+                                    <option value="{{ $autoridad }}"
+                                        {{ $autoridadSeleccionada === $autoridad ? 'selected' : '' }}>
+                                        {{ $autoridad }}
                                     </option>
                                 @endforeach
                             </select>
@@ -362,7 +441,24 @@
                             <thead>
                                 <tr style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
                                     <th class="arrastrable" style="padding: 12px 16px; font-weight: 600; color: #475b75; white-space: nowrap;" title="Arrastra para mover">Salón</th>
-                                    <th class="arrastrable" style="padding: 12px 16px; font-weight: 600; color: #475b75; white-space: nowrap;" title="Arrastra para mover">Fecha y Hora</th>
+                                    <th class="arrastrable" style="padding: 8px; font-weight: 600; color: #475b75; white-space: nowrap; min-width: 145px;" title="Filtrar por fecha">
+                                        <form method="GET" action="{{ route('salones.supervisar') }}" style="display: grid; gap: 5px;">
+                                            <input type="hidden" name="salon" value="{{ $salonSeleccionado }}">
+                                            <input type="hidden" name="responsable" value="{{ $responsableSeleccionado }}">
+                                            <input type="hidden" name="autoridad" value="{{ $autoridadSeleccionada }}">
+                                            <input type="hidden" name="buscar" value="{{ $buscar }}">
+
+                                            <label style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 126px; padding: 7px 9px; border: 1px solid #cbd5e1; border-radius: 5px; background: #fff; color: #475b75; cursor: pointer; font-weight: 500;">
+                                                <span>Fecha y Hora</span>
+                                                <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                                                <input id="filtro-fecha-supervisar" type="date" name="fecha"
+                                                    aria-label="Fecha y Hora"
+                                                    value="{{ $fechaSeleccionada }}"
+                                                    onchange="this.form.submit()"
+                                                    style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;">
+                                            </label>
+                                        </form>
+                                    </th>
                                     <th class="arrastrable" style="padding: 12px 16px; font-weight: 600; color: #475b75; white-space: nowrap;" title="Arrastra para mover">Descripción del Evento</th>
                                     <th class="arrastrable" style="padding: 12px 16px; font-weight: 600; color: #475b75; white-space: nowrap;" title="Arrastra para mover">Autoridad</th>
                                     <th class="arrastrable" style="padding: 12px 16px; font-weight: 600; color: #475b75; white-space: nowrap;" title="Arrastra para mover">Responsable</th>
@@ -377,11 +473,11 @@
                                 <tr style="border-bottom: 1px solid #e5e7eb; color: #334155; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9'" onmouseout="this.style.backgroundColor='transparent'">
                                     
                                     <td style="padding: 12px 16px; font-weight: 500; white-space: nowrap;">
-                                        <span style="background-color: #e2e8f0; padding: 4px 8px; border-radius: 4px; font-size: 12px;">{{ $reserva->salon }}</span>
+                                        <span style="display: inline-block; background-color: {{ $coloresSalones[$reserva->salon] ?? '#64748b' }}; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">{{ $reserva->salon }}</span>
                                     </td>
                                     
                                     <td style="padding: 12px 16px; white-space: nowrap;">
-                                        <div style="font-weight: 500; color: #1e293b;">{{ \Carbon\Carbon::parse($reserva->fecha_inicio)->format('d-m-Y') }}</div>
+                                        <div style="font-weight: 500; color: #1e293b;">{{ \Carbon\Carbon::parse($reserva->fecha_inicio)->format('d/m/Y') }}</div>
                                         <div style="font-size: 12px; color: #64748b;">{{ \Carbon\Carbon::parse($reserva->fecha_inicio)->format('H:i') }} a {{ \Carbon\Carbon::parse($reserva->fecha_fin)->format('H:i') }}</div>
                                     </td>
                                     
@@ -400,12 +496,6 @@
 
                                     <td style="padding: 12px 16px; white-space: normal;">
                                         <div style="font-weight: 500;">{{ $reserva->responsable ?: '-' }}</div>
-                                        @if($reserva->nombre_coordinador_externo)
-                                            <div style="font-size: 11px; color: #64748b; margin-top: 2px;" title="Coord. Externo">
-                                                <i class="fa-solid fa-user-tie" style="font-size: 10px;"></i> {{ $reserva->nombre_coordinador_externo }}
-                                                @if($reserva->telefono_coordinador_externo) ({{ $reserva->telefono_coordinador_externo }}) @endif
-                                            </div>
-                                        @endif
                                     </td>
                                     
                                     <td style="padding: 12px 16px; white-space: nowrap;">
@@ -658,18 +748,6 @@
                         </div>
                     </div>
                     <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
-                        <label style="width: 160px; font-size: 13px; color: #4b5563;">Nombre del coordinador externo *<br><small style="color:#9ca3af; font-weight:normal;">Nombre completo</small></label>
-                        <div style="flex: 1;">
-                            <input type="text" name="nombre_coordinador_externo" placeholder="" style="width: 100%; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; padding: 6px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
-                        </div>
-                    </div>
-                    <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
-                        <label style="width: 160px; font-size: 13px; color: #4b5563;">Celular del coordinador externo *</label>
-                        <div style="flex: 1;">
-                            <input type="tel" name="telefono_coordinador_externo" placeholder="" maxlength="15" oninput="this.value = this.value.replace(/[^0-9]/g, '')" style="width: 100%; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; padding: 6px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
-                        </div>
-                    </div>
-                    <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
                         <label style="width: 160px; font-size: 13px; color: #4b5563;">Requerimiento especial<br><small style="color:#9ca3af; font-weight:normal;">Personal o característica</small></label>
                         <div style="flex: 1;">
                             <input type="text" name="requerimientos_especiales" placeholder="" style="width: 100%; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; padding: 6px 12px; font-size: 13px; color: #1e293b; outline: none;">
@@ -808,18 +886,6 @@
                                 <option value="Libre">Libre</option>
                                 <option value="Con invitación">Con invitación</option>
                             </select>
-                        </div>
-                    </div>
-                    <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
-                        <label style="width: 160px; font-size: 13px; color: #4b5563;">Coord. externo *</label>
-                        <div style="flex: 1;">
-                            <input type="text" id="edit-coord-ext" name="nombre_coordinador_externo" style="width: 100%; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; padding: 6px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
-                        </div>
-                    </div>
-                    <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
-                        <label style="width: 160px; font-size: 13px; color: #4b5563;">Teléfono externo *</label>
-                        <div style="flex: 1;">
-                            <input type="tel" id="edit-tel-coord-ext" name="telefono_coordinador_externo" maxlength="15" oninput="this.value = this.value.replace(/[^0-9]/g, '')" style="width: 100%; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; padding: 6px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
                         </div>
                     </div>
                     <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">

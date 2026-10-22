@@ -73,17 +73,18 @@ return new class extends Migration
         $this->renombrarColumna('usuario_reserva', 'user_id', 'usuario_id');
         $this->renombrarColumna('usuario_reserva', 'event_id', 'reserva_id');
 
-        if (DB::selectOne("SELECT to_regclass('events_id_seq') AS secuencia")?->secuencia
-            && !DB::selectOne("SELECT to_regclass('reservas_id_seq') AS secuencia")?->secuencia) {
-            DB::statement('ALTER SEQUENCE events_id_seq RENAME TO reservas_id_seq');
+        if (DB::selectOne("SELECT to_regclass('pro_events_id_seq') AS secuencia")?->secuencia
+            && !DB::selectOne("SELECT to_regclass('pro_reservas_id_seq') AS secuencia")?->secuencia) {
+            DB::statement('ALTER SEQUENCE pro_events_id_seq RENAME TO pro_reservas_id_seq');
         }
-        if (DB::selectOne("SELECT to_regclass('events_id_seq') AS secuencia")?->secuencia
+        if (DB::selectOne("SELECT to_regclass('pro_events_id_seq') AS secuencia")?->secuencia
             && Schema::hasTable('eventos')
-            && !DB::selectOne("SELECT to_regclass('eventos_id_seq') AS secuencia")?->secuencia) {
-            DB::statement('ALTER SEQUENCE events_id_seq RENAME TO eventos_id_seq');
-        }        if (DB::selectOne("SELECT to_regclass('users_id_seq') AS secuencia")?->secuencia
-            && !DB::selectOne("SELECT to_regclass('usuarios_id_seq') AS secuencia")?->secuencia) {
-            DB::statement('ALTER SEQUENCE users_id_seq RENAME TO usuarios_id_seq');
+            && !DB::selectOne("SELECT to_regclass('pro_eventos_id_seq') AS secuencia")?->secuencia) {
+            DB::statement('ALTER SEQUENCE pro_events_id_seq RENAME TO pro_eventos_id_seq');
+        }
+        if (DB::selectOne("SELECT to_regclass('pro_users_id_seq') AS secuencia")?->secuencia
+            && !DB::selectOne("SELECT to_regclass('pro_usuarios_id_seq') AS secuencia")?->secuencia) {
+            DB::statement('ALTER SEQUENCE pro_users_id_seq RENAME TO pro_usuarios_id_seq');
         }
 
         $this->comentarCampos();
@@ -141,7 +142,7 @@ return new class extends Migration
         foreach ($campos as $tabla => $columnas) {
             foreach ($columnas as $columna) {
                 if (Schema::hasTable($tabla) && Schema::hasColumn($tabla, $columna)) {
-                    DB::statement("COMMENT ON COLUMN {$tabla}.{$columna} IS 'Campo en espanol. Cambio 12/10/2026.'");
+                    DB::statement("COMMENT ON COLUMN pro_{$tabla}.{$columna} IS 'Campo en espanol. Cambio 12/10/2026.'");
                 }
             }
         }

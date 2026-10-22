@@ -15,20 +15,20 @@ return new class extends Migration
 
         $textoTabla = 'Catálogo del calendario; los cambios se validan en la aplicación. Cambio 13/10/2026.';
         DB::statement(
-            'COMMENT ON TABLE salones IS ' . DB::connection()->getPdo()->quote($textoTabla)
+            'COMMENT ON TABLE pro_salones IS ' . DB::connection()->getPdo()->quote($textoTabla)
         );
 
         if (Schema::hasColumn('salones', 'color')) {
             $textoColor = 'Color fijo desde su creación; la aplicación impide repetirlo. Cambio 13/10/2026.';
             DB::statement(
-                'COMMENT ON COLUMN salones.color IS ' . DB::connection()->getPdo()->quote($textoColor)
+                'COMMENT ON COLUMN pro_salones.color IS ' . DB::connection()->getPdo()->quote($textoColor)
             );
         }
 
         if (Schema::hasColumn('salones', 'activo')) {
             $textoEstado = 'Indica si se ofrece para nuevas reservas; la aplicación bloquea la baja si hay reservas. Cambio 13/10/2026.';
             DB::statement(
-                'COMMENT ON COLUMN salones.activo IS ' . DB::connection()->getPdo()->quote($textoEstado)
+                'COMMENT ON COLUMN pro_salones.activo IS ' . DB::connection()->getPdo()->quote($textoEstado)
             );
         }
     }

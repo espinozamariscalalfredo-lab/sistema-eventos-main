@@ -3,8 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-// Conecta el catálogo de salones con PostgreSQL.
+// Catálogo de salones disponible para las reservas.
 class Salon extends Model
 {
     public const CREATED_AT = 'fecha_creacion';
@@ -17,5 +18,10 @@ class Salon extends Model
     protected function casts(): array
     {
         return ['activo' => 'boolean'];
+    }
+
+    public function reservas(): HasMany
+    {
+        return $this->hasMany(Reserva::class, 'salon_id');
     }
 }

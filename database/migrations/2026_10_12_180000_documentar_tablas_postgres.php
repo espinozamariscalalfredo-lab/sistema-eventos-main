@@ -97,11 +97,11 @@ return new class extends Migration
                 continue;
             }
 
-            DB::statement('COMMENT ON TABLE "'.$nombre.'" IS '.DB::getPdo()->quote($detalle['texto']));
+            DB::statement('COMMENT ON TABLE "pro_'.$nombre.'" IS '.DB::getPdo()->quote($detalle['texto']));
 
             foreach ($detalle['columnas'] as $columna => $texto) {
                 if (Schema::hasColumn($nombre, $columna)) {
-                    DB::statement('COMMENT ON COLUMN "'.$nombre.'"."'.$columna.'" IS '.DB::getPdo()->quote($texto.' Cambio 12/10/2026.'));
+                    DB::statement('COMMENT ON COLUMN "pro_'.$nombre.'"."'.$columna.'" IS '.DB::getPdo()->quote($texto.' Cambio 12/10/2026.'));
                 }
             }
         }

@@ -118,6 +118,21 @@
         .fc-dayGridMonth-view .fc-reserva-hora, .fc-dayGridMonth-view .fc-reserva-titulo { font-size: 9px; }
         .fc-timegrid .fc-col-header-cell-cushion > div:nth-child(2) { font-size: 1.3rem !important; }
 
+        /* Oculta el riel de desplazamiento del calendario sin bloquear el scroll. */
+        #calendar-container,
+        #calendar .fc-scroller,
+        #calendar .fc-daygrid-day-events {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+        #calendar-container::-webkit-scrollbar,
+        #calendar .fc-scroller::-webkit-scrollbar,
+        #calendar .fc-daygrid-day-events::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+
         /* Vista Disponible: tabla compacta para mostrar más salones en pantalla. */
         /* 2026-10-20: se redujeron fuente, anchos y espacios interiores. */
         .tabla-disponible { width: 100%; min-width: 0; table-layout: fixed; border-collapse: collapse; }
@@ -149,16 +164,24 @@
             <div class="salones-page-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
                 <div>
                     <h1 style="font-size: 28px; font-weight: bold; color: #475b75; margin-bottom: 4px;">Horario para salones</h1>
-                    <p style="font-size: 14px; color: #9ca3af;">Haga clic en un espacio libre para crear una nueva reserva. Haga clic en cualquier reserva para editarla.</p>
+                    @if(auth()->user()->rol === 'superadmin')
+                        <p style="font-size: 14px; color: #9ca3af;">Selecciona un espacio libre para crear una reserva o un evento para editarlo y administrarlo.</p>
+                    @elseif(auth()->user()->rol === 'admin')
+                        <p style="font-size: 14px; color: #9ca3af;">Selecciona un espacio libre para crear una reserva. Haz clic en un evento para cancelarlo.</p>
+                    @else
+                        <p style="font-size: 14px; color: #9ca3af;">Calendario de consulta. Puedes cambiar entre las vistas de mes, semana y día.</p>
+                    @endif
                 </div>
                 
                 <div style="display: flex; border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
                     <button style="background-color: #f9fafb; padding: 6px 16px; font-weight: bold; color: #374151; border-right: 1px solid #e5e7eb; font-size: 14px;">
                         <i class="fa-regular fa-calendar text-blue-500" style="margin-right: 8px;"></i> Usar
                     </button>
-                    <a href="{{ route('salones.supervisar') }}" style="background-color: white; padding: 6px 16px; color: #3b82f6; font-size: 14px; text-decoration: none;">
-                        <i class="fa-solid fa-sliders" style="margin-right: 8px;"></i> Supervisar
-                    </a>
+                    @if(auth()->user()->rol === 'superadmin')
+                        <a href="{{ route('salones.supervisar') }}" style="background-color: white; padding: 6px 16px; color: #3b82f6; font-size: 14px; text-decoration: none;">
+                            <i class="fa-solid fa-sliders" style="margin-right: 8px;"></i> Supervisar
+                        </a>
+                    @endif
                 </div>
             </div>
 
@@ -177,7 +200,9 @@
                                 <a href="#" class="view-option" data-view="dayGridMonth" style="display: block; padding: 6px 16px; text-decoration: none; color: inherit;">Mes</a>
                                 <a href="#" class="view-option" data-view="timeGridWeek" style="display: block; padding: 6px 16px; text-decoration: none; color: #1f2937; font-weight: bold; background-color: #f9fafb;">Semana</a>
                                 <a href="#" class="view-option" data-view="timeGridDay" style="display: block; padding: 6px 16px; text-decoration: none; color: inherit;">Día</a>
-                                <a href="#" class="view-option" data-view="disponible" style="display: block; padding: 6px 16px; text-decoration: none; color: inherit; border-top: 1px solid #e5e7eb;">Disponible</a>
+                                @if(auth()->user()->rol !== 'usuario')
+                                    <a href="#" class="view-option" data-view="disponible" style="display: block; padding: 6px 16px; text-decoration: none; color: inherit; border-top: 1px solid #e5e7eb;">Disponible</a>
+                                @endif
                             </div>
                         </div>
 
@@ -402,20 +427,6 @@
                         </div>
 
                         <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
-                            <label style="width: 160px; font-size: 13px; color: #4b5563;">Nombre Coord. externo *</label>
-                            <div style="flex: 1;">
-                                <input type="text" name="nombre_coordinador_externo" placeholder="" style="width: 100%; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; padding: 6px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
-                            </div>
-                        </div>
-
-                        <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
-                            <label style="width: 160px; font-size: 13px; color: #4b5563;">Celular Coord. externo *</label>
-                            <div style="flex: 1;">
-                                <input type="tel" name="telefono_coordinador_externo" placeholder="" maxlength="15" oninput="this.value = this.value.replace(/[^0-9]/g, '')" style="width: 100%; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; padding: 6px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
-                            </div>
-                        </div>
-
-                        <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
                             <label style="width: 160px; font-size: 13px; color: #4b5563;">Requerimiento especial</label>
                             <div style="flex: 1;">
                                 <input type="text" name="requerimientos_especiales" placeholder="" style="width: 100%; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; padding: 6px 12px; font-size: 13px; color: #1e293b; outline: none;">
@@ -587,20 +598,6 @@
                         </div>
 
                         <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
-                            <label style="width: 160px; font-size: 13px; color: #4b5563;">Coord. externo *</label>
-                            <div style="flex: 1;">
-                                <input type="text" id="edit-coord-ext" name="nombre_coordinador_externo" style="width: 100%; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; padding: 6px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
-                            </div>
-                        </div>
-
-                        <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
-                            <label style="width: 160px; font-size: 13px; color: #4b5563;">Teléfono externo *</label>
-                            <div style="flex: 1;">
-                                <input type="tel" id="edit-tel-coord-ext" name="telefono_coordinador_externo" maxlength="15" oninput="this.value = this.value.replace(/[^0-9]/g, '')" style="width: 100%; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; padding: 6px 12px; font-size: 13px; color: #1e293b; outline: none;" required>
-                            </div>
-                        </div>
-
-                        <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
                             <label style="width: 160px; font-size: 13px; color: #4b5563;">Requerimiento especial</label>
                             <div style="flex: 1;">
                                 <input type="text" id="edit-req-esp" name="requerimientos_especiales" style="width: 100%; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; padding: 6px 12px; font-size: 13px; color: #1e293b; outline: none;">
@@ -629,11 +626,11 @@
                         <div style="display: flex; gap: 8px; align-items: center;">
                             <button type="button" id="btn-edit-cancel" style="background: white; border: 1px solid #d1d5db; color: #374151; padding: 6px 16px; border-radius: 4px; font-size: 13px; cursor: pointer;">Cerrar</button>
                             
-                            @if(auth()->user()->rol === 'admin' || auth()->user()->rol === 'superadmin')
+                            @if(auth()->user()->rol === 'superadmin')
                                 <button type="submit" id="btn-edit-update" style="background: #2563eb; color: white; border: none; padding: 6px 16px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer;">Actualizar reserva</button>
                             @endif
 
-                            @if(auth()->user()->rol === 'admin')
+                            @if(auth()->user()->rol === 'superadmin')
                                 <button type="button" id="btn-edit-delete" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;" title="Eliminar reserva">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
@@ -649,6 +646,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
+            var rolActual = @json(auth()->user()->rol ?? 'usuario');
 
             // Muestra fecha local legible y conserva el selector nativo del navegador (20/10/2026).
             function formatoFechaHora(valor) {
@@ -1156,9 +1154,86 @@
                     });
             }
 
+            function cancelarEventoDesdeCalendario(evento) {
+                var props = evento.extendedProps || {};
+                if (props.estado === 'cancelado') {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Evento ya cancelado',
+                        text: 'Este evento ya se encuentra cancelado.',
+                        confirmButtonColor: '#2563eb'
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: '¿Cancelar este evento?',
+                    text: evento.title + (props.salon ? ' · ' + props.salon : ''),
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, cancelar',
+                    cancelButtonText: 'Volver',
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#64748b'
+                }).then(async function(resultado) {
+                    if (!resultado.isConfirmed) return;
+
+                    try {
+                        var respuesta = await fetch('/api/salones/reservas/' + encodeURIComponent(evento.id) + '/cancelar', {
+                            method: 'PATCH',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                                'Accept': 'application/json'
+                            }
+                        });
+                        var datos = await respuesta.json();
+                        if (!respuesta.ok || !datos.success) {
+                            throw new Error(datos.message || 'No se pudo cancelar el evento.');
+                        }
+
+                        calendar.refetchEvents();
+                        miniEventDatesCache = {};
+                        updateMiniCalendar(currentMiniYear, currentMiniMonth);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Evento cancelado',
+                            text: 'El evento se canceló correctamente.',
+                            confirmButtonColor: '#2563eb'
+                        });
+                    } catch (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'No se pudo cancelar',
+                            text: error.message || 'Intenta nuevamente.',
+                            confirmButtonColor: '#2563eb'
+                        });
+                    }
+                });
+            }
+
             function abrirEdicionReserva(evento) {
+                var props = evento.extendedProps || {};
+
+                if (rolActual === 'admin') {
+                    cancelarEventoDesdeCalendario(evento);
+                    return;
+                }
+
+                if (rolActual !== 'superadmin') {
+                    var formatoEvento = new Intl.DateTimeFormat('es-BO', { dateStyle: 'short', timeStyle: 'short' });
+                    var detalleEvento = (props.salon ? 'Salón: ' + props.salon + '\n' : '')
+                        + (evento.start ? 'Inicio: ' + formatoEvento.format(evento.start) : '');
+                    Swal.fire({
+                        icon: 'info',
+                        title: evento.title || 'Evento del calendario',
+                        text: detalleEvento || 'Puedes consultar este evento en el calendario.',
+                        confirmButtonText: 'Entendido',
+                        confirmButtonColor: '#2563eb'
+                    });
+                    return;
+                }
+
                 var modal = document.getElementById('edit-booking-modal');
-                var props = evento.extendedProps;
 
                 document.getElementById('edit-event-id').value = evento.id;
                 establecerFechaHora('edit-start', evento.startStr);
@@ -1176,8 +1251,6 @@
                 document.getElementById('edit-tipo-evento').value = props.tipo_evento || 'Visita guiada';
                 document.getElementById('edit-aforo').value = props.aforo || '';
                 document.getElementById('edit-tipo-ingreso').value = props.tipo_ingreso || 'Bajo lista';
-                document.getElementById('edit-coord-ext').value = props.nombre_coordinador_externo || '';
-                document.getElementById('edit-tel-coord-ext').value = props.telefono_coordinador_externo || '';
                 document.getElementById('edit-req-esp').value = props.requerimientos_especiales || '';
                 document.getElementById('edit-registrado-por').value = props.registrado_por || '';
                 document.getElementById('edit-coord-int').value = props.coordinador_interno || '';
@@ -1321,8 +1394,6 @@
 
                     var detalles = [
                         { valor: arg.event.title, clase: 'fc-reserva-titulo' },
-                        { valor: props.nombre_coordinador_externo, clase: 'fc-reserva-detalle' },
-                        { valor: props.telefono_coordinador_externo || props.telefono_usuario, clase: 'fc-reserva-detalle' },
                         { valor: props.nombre_autoridad, clase: 'fc-reserva-detalle' },
                         { valor: props.responsable, clase: 'fc-reserva-detalle' },
                         { valor: props.nombre_usuario, clase: 'fc-reserva-detalle' }
@@ -1370,8 +1441,6 @@
                     var props = info.event.extendedProps;
                     var detalles = [
                         info.event.title,
-                        props.nombre_coordinador_externo || props.nombre_usuario,
-                        props.telefono_coordinador_externo || props.telefono_usuario,
                         props.nombre_autoridad,
                         props.responsable,
                         props.tipo_evento,
@@ -1405,9 +1474,14 @@
                 },
 
                 select: function(info) {
-                    let userRole = "{{ auth()->user()->rol ?? 'usuario' }}";
-                    if(userRole !== 'admin' && userRole !== 'superadmin') {
-                        alert('Modo de solo lectura: No tienes permisos para crear reservas.');
+                    if (rolActual === 'usuario') {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Calendario de consulta',
+                            text: 'Tu cuenta puede consultar el calendario, pero no crear ni modificar reservas.',
+                            confirmButtonText: 'Entendido',
+                            confirmButtonColor: '#2563eb'
+                        });
                         return;
                     }
 
