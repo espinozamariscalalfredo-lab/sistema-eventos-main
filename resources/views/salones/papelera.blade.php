@@ -87,7 +87,7 @@
                                 </button>
                                 
                                 <!-- Botón Restaurar (Lápiz) -->
-                                <button class="tabla-icono-accion" onclick="openRestoreModal({{ $reserva->id }}, '{{ $reserva->fecha_inicio }}', '{{ $reserva->fecha_fin }}', '{{ $reserva->titulo }}', '{{ $reserva->nombre_coordinador_externo ?? 'N/A' }}', '{{ $reserva->telefono_coordinador_externo ?? 'N/A' }}', '{{ $reserva->nombre_autoridad ?? 'N/A' }}', '{{ $reserva->responsable ?? 'N/A' }}', '{{ $reserva->salon }}', '{{ $reserva->fecha_creacion->format('Y-m-d H:i') }}', '{{ $reserva->eliminado_en->format('Y-m-d H:i') }}', '{{ $reserva->nombre_usuario ?? 'administrador' }}')" title="Restaurar reserva" aria-label="Restaurar reserva">
+                                <button class="tabla-icono-accion" onclick="openRestoreModal({{ $reserva->id }}, '{{ $reserva->fecha_inicio }}', '{{ $reserva->fecha_fin }}', '{{ $reserva->titulo }}', '{{ $reserva->nombre_autoridad ?? 'N/A' }}', '{{ $reserva->responsable ?? 'N/A' }}', '{{ $reserva->salon }}', '{{ $reserva->fecha_creacion->format('Y-m-d H:i') }}', '{{ $reserva->eliminado_en->format('Y-m-d H:i') }}', '{{ $reserva->nombre_usuario ?? 'administrador' }}')" title="Restaurar reserva" aria-label="Restaurar reserva">
                                     <i class="fa-regular fa-pen-to-square"></i>
                                 </button>
                             </td>
@@ -228,12 +228,6 @@
                     <strong style="color: #1f2937;">Tipo de ingreso*</strong> <span id="view-entry"></span>
                 </div>
                 <div style="display: grid; grid-template-columns: 180px 1fr; margin-bottom: 12px;">
-                    <strong style="color: #1f2937;">Nombre del coordinador externo*</strong> <span id="view-ext-name"></span>
-                </div>
-                <div style="display: grid; grid-template-columns: 180px 1fr; margin-bottom: 12px;">
-                    <strong style="color: #1f2937;">Celular del coordinador externo*</strong> <span id="view-ext-phone"></span>
-                </div>
-                <div style="display: grid; grid-template-columns: 180px 1fr; margin-bottom: 12px;">
                     <strong style="color: #1f2937;">Requerimiento especial</strong> <span id="view-special"></span>
                 </div>
                 <div style="display: grid; grid-template-columns: 180px 1fr; margin-bottom: 12px;">
@@ -273,16 +267,6 @@
                 <div style="margin-bottom: 16px; display: flex; gap: 10px; align-items: flex-start;">
                     <i class="fa-solid fa-align-left" style="color: #6b7280; width: 20px; text-align: center; margin-top: 10px;"></i>
                     <textarea id="rest-title" rows="2" readonly style="flex: 1; border: 1px solid #f3f4f6; border-radius: 4px; padding: 8px; font-size: 13px; background: #f9fafb; color: #6b7280;"></textarea>
-                </div>
-
-                <div style="margin-bottom: 16px; display: flex; gap: 10px; align-items: center;">
-                    <i class="fa-solid fa-user" style="color: #6b7280; width: 20px; text-align: center;"></i>
-                    <input type="text" id="rest-ext-name" readonly style="width: 250px; border: 1px solid #f3f4f6; border-radius: 4px; padding: 8px; font-size: 13px; background: #f9fafb; color: #6b7280;">
-                </div>
-
-                <div style="margin-bottom: 16px; display: flex; gap: 10px; align-items: center;">
-                    <i class="fa-solid fa-mobile-screen" style="color: #6b7280; width: 20px; text-align: center;"></i>
-                    <input type="text" id="rest-ext-phone" readonly style="width: 250px; border: 1px solid #f3f4f6; border-radius: 4px; padding: 8px; font-size: 13px; background: #f9fafb; color: #6b7280;">
                 </div>
 
                 <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
@@ -341,8 +325,6 @@
             
             document.getElementById('view-aforo').innerText = event.aforo || 'N/A';
             document.getElementById('view-entry').innerText = event.tipo_ingreso || 'N/A';
-            document.getElementById('view-ext-name').innerText = event.nombre_coordinador_externo || 'N/A';
-            document.getElementById('view-ext-phone').innerText = event.telefono_coordinador_externo || 'N/A';
             document.getElementById('view-special').innerText = event.requerimientos_especiales || 'N/A';
             document.getElementById('view-registered-by').innerText = event.registrado_por || 'N/A';
             document.getElementById('view-int-coordinator').innerText = event.coordinador_interno || 'N/A';
@@ -352,12 +334,10 @@
             document.getElementById('modal-view').style.display = 'flex';
         }
 
-        function openRestoreModal(id, start, end, title, extName, extPhone, authority, responsable, salon, created, deleted, user) {
+        function openRestoreModal(id, start, end, title, authority, responsable, salon, created, deleted, user) {
             document.getElementById('rest-start').value = start.slice(0, 16).replace('T', ' ');
             document.getElementById('rest-end').value = end.slice(0, 16).replace('T', ' ');
             document.getElementById('rest-title').value = title;
-            document.getElementById('rest-ext-name').value = extName;
-            document.getElementById('rest-ext-phone').value = extPhone;
             document.getElementById('rest-authority').value = authority;
             document.getElementById('rest-responsable').value = responsable;
             document.getElementById('rest-salon').value = salon;

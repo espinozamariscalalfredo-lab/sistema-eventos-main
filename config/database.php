@@ -1,6 +1,6 @@
 <?php
 
-// BACKEND/DATOS. 20/10/2026: conexiones y esquema PostgreSQL; secretos vienen de .env.
+// Conexiones de la aplicación; los datos sensibles se cargan desde .env.
 use Illuminate\Support\Str;
 
 return [
@@ -32,7 +32,7 @@ return [
 
     'connections' => [
 
-        // PostgreSQL: único motor de base de datos de la aplicación.
+        // Las tablas de esta aplicación usan el prefijo pro_ en PostgreSQL.
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DB_URL'),
@@ -42,7 +42,7 @@ return [
             'username' => env('DB_USERNAME', 'postgres'),
             'password' => env('DB_PASSWORD', ''),
             'charset' => env('DB_CHARSET', 'utf8'),
-            'prefix' => '',
+            'prefix' => 'pro_',
             'prefix_indexes' => true,
             'search_path' => env('DB_SCHEMA', 'protocolos'),
             'sslmode' => env('DB_SSLMODE', 'prefer'),

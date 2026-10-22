@@ -95,7 +95,7 @@ class SalonController extends Controller
 
     private function validarSuperadmin(): void
     {
-        abort_unless(in_array(auth()->user()?->rol, ['admin', 'superadmin'], true), 403, 'Solo el admin y superadmin pueden administrar estos nombres.');
+        abort_unless(auth()->user()?->rol === 'superadmin', 403, 'Solo el superadministrador puede administrar los salones.');
     }
 
     public function calendario(): View

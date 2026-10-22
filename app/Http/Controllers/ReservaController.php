@@ -55,12 +55,13 @@ class ReservaController extends Controller
         // Usa los colores guardados en el catálogo.
         $salonColors = Salon::pluck('color', 'nombre')->all();
 
-        $reservas = Reserva::all()->map(function ($reserva) use ($salonColors) {
+        $rol = auth()->user()?->rol;
+        $reservas = Reserva::all()->map(function ($reserva) use ($salonColors, $rol) {
             // Las reservas antiguas sin salón usan un color de respaldo.
             $color = $salonColors[$reserva->salon] ?? '#f59e0b';
             [$titulo, $estado] = $this->leerEstadoTitulo($reserva->titulo);
 
-            return [
+            $evento = [
                 // FullCalendar requiere estas tres claves en inglés.
                 'id' => $reserva->id,
                 'title' => $titulo,
@@ -70,59 +71,158 @@ class ReservaController extends Controller
                 'backgroundColor' => $color,
                 'borderColor' => $color,
                 'textColor' => '#ffffff',
-                // Los campos adicionales se usan en el detalle y la edición.
-                'nombre_usuario' => $reserva->nombre_usuario,
-                'telefono_usuario' => $reserva->telefono_usuario,
-                'nombre_autoridad' => $reserva->nombre_autoridad,
-                'responsable' => $reserva->responsable,
-                'nombre_coordinador_externo' => $reserva->nombre_coordinador_externo,
-                'telefono_coordinador_externo' => $reserva->telefono_coordinador_externo,
-                'tipo_evento' => $reserva->tipo_evento,
-                'aforo' => $reserva->aforo,
-                'tipo_ingreso' => $reserva->tipo_ingreso,
-                'requerimientos' => $reserva->requerimientos,
-                'requerimientos_especiales' => $reserva->requerimientos_especiales,
-                'registrado_por' => $reserva->registrado_por,
-                'coordinador_interno' => $reserva->coordinador_interno,
-                'modificado_por' => $reserva->modificado_por,
                 'salon' => $reserva->salon,
-                'fecha_creacion' => $reserva->fecha_creacion,
                 'estado' => $estado,
             ];
+
+            if ($rol === 'superadmin') {
+                $evento += [
+                    'nombre_usuario' => $reserva->nombre_usuario,
+                    'telefono_usuario' => $reserva->telefono_usuario,
+                    'nombre_autoridad' => $reserva->nombre_autoridad,
+                    'responsable' => $reserva->responsable,
+                    'tipo_evento' => $reserva->tipo_evento,
+                    'aforo' => $reserva->aforo,
+                    'tipo_ingreso' => $reserva->tipo_ingreso,
+                    'requerimientos' => $reserva->requerimientos,
+                    'requerimientos_especiales' => $reserva->requerimientos_especiales,
+                    'registrado_por' => $reserva->registrado_por,
+                    'coordinador_interno' => $reserva->coordinador_interno,
+                    'modificado_por' => $reserva->modificado_por,
+                    'fecha_creacion' => $reserva->fecha_creacion,
+                ];
+            }
+
+            return $evento;
         });
 
         return response()->json($reservas);
     }
 
     
-    // Lista reservas y permite filtrar por salón o responsable, independientemente.
+    // Lista reservas y combina los filtros disponibles.
     public function supervisar(Request $request)
     {
+        abort_unless(auth()->user()?->rol === 'superadmin', 403, 'Solo el superadministrador puede supervisar las reservas.');
+
+        $request->validate([
+            'fecha' => ['nullable', 'date_format:Y-m-d'],
+            'buscar' => ['nullable', 'string', 'max:100'],
+        ]);
+
         // Catálogo de salones.
         $salones = Salon::orderBy('orden')
             ->orderBy('nombre')
             ->get();
+        $coloresSalones = $salones->pluck('color', 'nombre')->all();
 
-        // Responsables registrados en las reservas.
-        $responsables = Reserva::whereNotNull('responsable')
+        // Valores seleccionados en los filtros.
+        $salonSeleccionado = $request->query('salon');
+        $responsableSeleccionado = $request->query('responsable');
+        $autoridadSeleccionada = $request->query('autoridad');
+        $fechaSeleccionada = $request->query('fecha');
+        $buscar = trim((string) $request->query('buscar', ''));
+
+        $aplicarBusqueda = function ($consulta) use ($buscar) {
+            if ($buscar === '') {
+                return;
+            }
+
+            $coincidencia = '%'.$buscar.'%';
+            $digitosFecha = preg_replace('/\D+/', '', $buscar);
+            $buscarFechaNumerica = preg_match('/^[\d\s\/.-]+$/u', $buscar) === 1
+                && strlen($digitosFecha) >= 4;
+
+            $consulta->where(function ($query) use ($coincidencia, $digitosFecha, $buscarFechaNumerica) {
+                $query->where('salon', 'ILIKE', $coincidencia)
+                    ->orWhereRaw("to_char(fecha_inicio, 'DD-MM-YYYY HH24:MI') ILIKE ?", [$coincidencia])
+                    ->orWhereRaw("to_char(fecha_inicio, 'DD/MM/YYYY HH24:MI') ILIKE ?", [$coincidencia])
+                    ->orWhereRaw("to_char(fecha_fin, 'DD-MM-YYYY HH24:MI') ILIKE ?", [$coincidencia])
+                    ->orWhereRaw("to_char(fecha_fin, 'DD/MM/YYYY HH24:MI') ILIKE ?", [$coincidencia])
+                    ->orWhere('titulo', 'ILIKE', $coincidencia)
+                    ->orWhere('requerimientos_especiales', 'ILIKE', $coincidencia)
+                    ->orWhere('nombre_autoridad', 'ILIKE', $coincidencia)
+                    ->orWhere('responsable', 'ILIKE', $coincidencia)
+                    ->orWhere('tipo_evento', 'ILIKE', $coincidencia)
+                    ->orWhereRaw('CAST(aforo AS TEXT) ILIKE ?', [$coincidencia])
+                    ->orWhere('tipo_ingreso', 'ILIKE', $coincidencia)
+                    ->orWhere('registrado_por', 'ILIKE', $coincidencia)
+                    ->orWhere('nombre_usuario', 'ILIKE', $coincidencia)
+                    ->orWhereRaw("to_char(fecha_creacion, 'DD/MM/YY HH24:MI') ILIKE ?", [$coincidencia]);
+
+                if ($buscarFechaNumerica) {
+                    $fechaCompacta = '%'.$digitosFecha.'%';
+                    $query->orWhereRaw("to_char(fecha_inicio, 'DDMMYYYYHH24MI') ILIKE ?", [$fechaCompacta])
+                        ->orWhereRaw("to_char(fecha_inicio, 'YYYYMMDDHH24MI') ILIKE ?", [$fechaCompacta])
+                        ->orWhereRaw("to_char(fecha_fin, 'DDMMYYYYHH24MI') ILIKE ?", [$fechaCompacta])
+                        ->orWhereRaw("to_char(fecha_fin, 'YYYYMMDDHH24MI') ILIKE ?", [$fechaCompacta]);
+                }
+            });
+        };
+
+        $crearConsultaFiltrada = function (array $excluir = []) use (
+            $salonSeleccionado,
+            $responsableSeleccionado,
+            $autoridadSeleccionada,
+            $fechaSeleccionada,
+            $aplicarBusqueda
+        ) {
+            $consulta = Reserva::query();
+
+            if (!in_array('salon', $excluir, true) && is_string($salonSeleccionado) && $salonSeleccionado !== '') {
+                $consulta->where('salon', $salonSeleccionado);
+            }
+
+            if (!in_array('responsable', $excluir, true) && is_string($responsableSeleccionado) && $responsableSeleccionado !== '') {
+                $consulta->where('responsable', $responsableSeleccionado);
+            }
+
+            if (!in_array('autoridad', $excluir, true) && is_string($autoridadSeleccionada) && $autoridadSeleccionada !== '') {
+                $consulta->where('nombre_autoridad', $autoridadSeleccionada);
+            }
+
+            if (is_string($fechaSeleccionada) && $fechaSeleccionada !== '') {
+                $consulta->whereDate('fecha_inicio', $fechaSeleccionada);
+            }
+
+            $aplicarBusqueda($consulta);
+
+            return $consulta;
+        };
+
+        // Cada lista toma en cuenta la fecha, la búsqueda y los demás filtros activos.
+        $hayFiltrosParaSalones = $buscar !== ''
+            || (is_string($responsableSeleccionado) && $responsableSeleccionado !== '')
+            || (is_string($autoridadSeleccionada) && $autoridadSeleccionada !== '')
+            || (is_string($fechaSeleccionada) && $fechaSeleccionada !== '');
+
+        if ($hayFiltrosParaSalones) {
+            $nombresSalonesEncontrados = $crearConsultaFiltrada(['salon'])
+                ->whereNotNull('salon')
+                ->distinct()
+                ->pluck('salon');
+            $salonesFiltro = $salones
+                ->filter(fn ($salon) => $nombresSalonesEncontrados->contains($salon->nombre))
+                ->values();
+        } else {
+            $salonesFiltro = $salones;
+        }
+
+        $responsables = $crearConsultaFiltrada(['responsable'])
+            ->whereNotNull('responsable')
             ->where('responsable', '!=', '')
             ->distinct()
             ->orderBy('responsable')
             ->pluck('responsable');
 
-        // Valores seleccionados en los filtros.
-        $salonSeleccionado = $request->query('salon');
-        $responsableSeleccionado = $request->query('responsable');
+        $autoridades = $crearConsultaFiltrada(['autoridad'])
+            ->whereNotNull('nombre_autoridad')
+            ->where('nombre_autoridad', '!=', '')
+            ->distinct()
+            ->orderBy('nombre_autoridad')
+            ->pluck('nombre_autoridad');
 
-        $consulta = Reserva::query();
-
-        // Filtros independientes: si se selecciona responsable,
-        // se filtra por responsable; de lo contrario, por salón.
-        if (is_string($responsableSeleccionado) && $responsableSeleccionado !== '') {
-            $consulta->where('responsable', $responsableSeleccionado);
-        } elseif (is_string($salonSeleccionado) && $salonSeleccionado !== '') {
-            $consulta->where('salon', $salonSeleccionado);
-        }
+        $consulta = $crearConsultaFiltrada();
 
         // Conserva el filtro al cambiar de página.
         $reservas = $consulta
@@ -138,9 +238,15 @@ class ReservaController extends Controller
         return view('salones.supervisar', compact(
             'reservas',
             'salones',
+            'salonesFiltro',
+            'coloresSalones',
             'salonSeleccionado',
             'responsables',
             'responsableSeleccionado',
+            'autoridades',
+            'autoridadSeleccionada',
+            'fechaSeleccionada',
+            'buscar',
             'ultimoCambio'
         ));
     }
@@ -149,8 +255,8 @@ class ReservaController extends Controller
     // Crea una reserva desde el calendario.
     public function guardar(Request $request)
     {
-        if (!in_array(auth()->user()->rol, ['admin', 'superadmin'], true)) {
-            return response()->json(['success' => false, 'message' => 'No tienes permiso para crear.'], 403);
+        if (!in_array(auth()->user()?->rol, ['admin', 'superadmin'], true)) {
+            return response()->json(['success' => false, 'message' => 'Tu cuenta solo permite consultar el calendario.'], 403);
         }
         
         // AHORA VALIDAMOS TODOS LOS CAMPOS DEL FORMULARIO UNIFICADO
@@ -161,8 +267,6 @@ class ReservaController extends Controller
             'nombre_usuario' => 'nullable|string',
             'nombre_autoridad' => 'nullable|string',
             'responsable' => 'nullable|string',
-            'nombre_coordinador_externo' => 'nullable|string',
-            'telefono_coordinador_externo' => 'nullable|string',
             'tipo_evento' => 'nullable|string',
             'aforo' => 'nullable|integer',
             'tipo_ingreso' => 'nullable|string',
@@ -213,6 +317,8 @@ class ReservaController extends Controller
     // Devuelve una reserva para completar el formulario de edición.
     public function obtenerReservaApi($id)
     {
+        abort_unless(auth()->user()?->rol === 'superadmin', 403, 'Solo el superadministrador puede consultar el detalle de edición.');
+
         $reserva = Reserva::findOrFail($id);
         [$titulo, $estado] = $this->leerEstadoTitulo($reserva->titulo);
         $reserva->setAttribute('titulo', $titulo);
@@ -224,16 +330,11 @@ class ReservaController extends Controller
     // Actualiza una reserva desde el calendario.
     public function actualizar(Request $request, $id)
     {
-        if (!in_array(auth()->user()->rol, ['admin', 'superadmin'], true)) {
-            return response()->json(['success' => false, 'message' => 'No tienes permiso para editar.'], 403);
+        if (auth()->user()?->rol !== 'superadmin') {
+            return response()->json(['success' => false, 'message' => 'Solo el superadministrador puede editar reservas.'], 403);
         }
 
         $reserva = Reserva::findOrFail($id);
-
-        // Solo superadmin puede cambiar el estado visible del evento.
-        if ($request->exists('estado') && auth()->user()->rol !== 'superadmin') {
-            return response()->json(['success' => false, 'message' => 'Solo el superadmin puede cambiar el estado del evento.'], 403);
-        }
 
         [, $estadoActual] = $this->leerEstadoTitulo($reserva->titulo);
         $estadoSolicitado = $request->input('estado', $estadoActual);
@@ -289,11 +390,31 @@ class ReservaController extends Controller
         return response()->json(['success' => true]);
     }
 
+    // Cancela un evento sin permitir que el administrador cambie sus datos.
+    public function cancelar($id)
+    {
+        if (!in_array(auth()->user()?->rol, ['admin', 'superadmin'], true)) {
+            return response()->json(['success' => false, 'message' => 'Tu cuenta solo permite consultar el calendario.'], 403);
+        }
+
+        $reserva = Reserva::findOrFail($id);
+        [, $estado] = $this->leerEstadoTitulo($reserva->titulo);
+
+        if ($estado !== 'cancelado') {
+            [$tituloLimpio] = $this->leerEstadoTitulo($reserva->titulo);
+            $reserva->titulo = $this->guardarEstadoEnTitulo(mb_substr($tituloLimpio, 0, 243), 'cancelado');
+            $reserva->modificado_por = $this->actorActual();
+            $reserva->save();
+        }
+
+        return response()->json(['success' => true, 'message' => 'El evento fue cancelado.']);
+    }
+
     // Mueve una reserva a la papelera.
     public function eliminar($id)
     {
-        if (auth()->user()->rol !== 'admin') {
-            return response()->json(['success' => false, 'message' => 'Solo el Admin puede eliminar reservas.'], 403);
+        if (auth()->user()?->rol !== 'superadmin') {
+            return response()->json(['success' => false, 'message' => 'Solo el superadministrador puede eliminar reservas.'], 403);
         }
 
         $reserva = Reserva::findOrFail($id);
@@ -307,6 +428,8 @@ class ReservaController extends Controller
     // Abre el formulario completo de una reserva.
     public function mostrarProtocolo($id)
     {
+        abort_unless(auth()->user()?->rol === 'superadmin', 403, 'Solo el superadministrador puede consultar protocolos completos.');
+
         $reserva = Reserva::findOrFail($id);
         $salones = Salon::orderBy('orden')->get();
 
@@ -316,9 +439,7 @@ class ReservaController extends Controller
     // Guarda el protocolo y vuelve al calendario.
     public function actualizarProtocolo(Request $request, $id)
     {
-        if (auth()->user()->rol === 'usuario' || empty(auth()->user()->rol)) {
-            abort(403, 'No tienes permiso para modificar los protocolos.');
-        }
+        abort_unless(auth()->user()?->rol === 'superadmin', 403, 'Solo el superadministrador puede modificar protocolos.');
 
         $reserva = Reserva::findOrFail($id);
 
@@ -330,8 +451,6 @@ class ReservaController extends Controller
             'requerimientos' => 'nullable|array',
             'aforo' => 'nullable|integer',
             'tipo_ingreso' => 'nullable|string',
-            'nombre_coordinador_externo' => 'nullable|string',
-            'telefono_coordinador_externo' => 'nullable|string',
             'requerimientos_especiales' => 'nullable|string',
             'registrado_por' => 'nullable|string',
             'coordinador_interno' => 'nullable|string',
@@ -348,7 +467,7 @@ class ReservaController extends Controller
     // Lista las reservas enviadas a la papelera.
     public function papelera(Request $request)
     {
-        if (auth()->user()->rol !== 'admin') abort(403, 'Acceso denegado.');
+        abort_unless(auth()->user()?->rol === 'superadmin', 403, 'Solo el superadministrador puede administrar la papelera.');
 
         $salones = Salon::orderBy('orden')->orderBy('nombre')->get();
         $salonSeleccionado = $request->query('salon');
@@ -364,7 +483,7 @@ class ReservaController extends Controller
     // Elimina de forma permanente las reservas de la papelera.
     public function vaciarPapelera()
     {
-        if (auth()->user()->rol !== 'admin') abort(403, 'Acceso denegado.');
+        abort_unless(auth()->user()?->rol === 'superadmin', 403, 'Solo el superadministrador puede administrar la papelera.');
         
         Reserva::onlyTrashed()->forceDelete();
         return back();
@@ -372,9 +491,7 @@ class ReservaController extends Controller
     // Devuelve una reserva de la papelera.
     public function restaurarPapelera($id)
     {
-        if (auth()->user()->rol === 'usuario' || empty(auth()->user()->rol)) {
-            abort(403, 'Acceso denegado.');
-        }
+        abort_unless(auth()->user()?->rol === 'superadmin', 403, 'Solo el superadministrador puede administrar la papelera.');
 
         $reserva = Reserva::onlyTrashed()->findOrFail($id);
         $reserva->modificado_por = $this->actorActual();
@@ -386,6 +503,8 @@ class ReservaController extends Controller
     // Muestra el historial paginado de reservas.
     public function supervisarReservas()
     {
+        abort_unless(auth()->user()?->rol === 'superadmin', 403, 'Solo el superadministrador puede consultar el historial.');
+
         $reservas = Reserva::orderBy('fecha_creacion', 'desc')->paginate(10);
         $totalFormularios = Reserva::count();
         // Cambiar el nombre aquí y en el compact:
@@ -396,12 +515,16 @@ class ReservaController extends Controller
     // Abre el formulario completo de creación.
     public function mostrarFormularioCrear()
     {
+        abort_unless(in_array(auth()->user()?->rol, ['admin', 'superadmin'], true), 403, 'Tu cuenta solo permite consultar el calendario.');
+
         return view('salones.crear_reserva', ['salones' => Salon::where('activo', true)->orderBy('orden')->get()]);
     }
 
     // Crea una reserva con el horario inicial del formulario.
     public function guardarReservaCompleta(Request $request)
     {
+        abort_unless(in_array(auth()->user()?->rol, ['admin', 'superadmin'], true), 403, 'Tu cuenta solo permite consultar el calendario.');
+
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
             'nombre_autoridad' => 'nullable|string',
@@ -409,8 +532,6 @@ class ReservaController extends Controller
             'requerimientos' => 'nullable|array',
             'aforo' => 'nullable|integer',
             'tipo_ingreso' => 'nullable|string',
-            'nombre_coordinador_externo' => 'nullable|string',
-            'telefono_coordinador_externo' => 'nullable|string',
             'requerimientos_especiales' => 'nullable|string',
             'registrado_por' => 'nullable|string',
             'coordinador_interno' => 'nullable|string',
@@ -430,6 +551,8 @@ class ReservaController extends Controller
     // Exporta las reservas a CSV aplicando el filtro de salón si existe
     public function exportarCsv(Request $request)
     {
+        abort_unless(auth()->user()?->rol === 'superadmin', 403, 'Solo el superadministrador puede exportar las reservas.');
+
         // 1. Obtener el filtro de la URL
         $salonSeleccionado = $request->query('salon');
         

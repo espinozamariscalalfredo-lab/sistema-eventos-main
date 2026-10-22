@@ -104,18 +104,6 @@
         <p class="text-xs text-gray-400 mt-1">Como ingresarán al edificio</p>
     </div>
 
-    <!-- Nombre del coordinador externo -->
-    <div>
-        <label class="block text-sm font-bold text-gray-700 mb-1">Nombre del coordinador externo *</label>
-        <input type="text" name="nombre_coordinador_externo" value="{{ old('nombre_coordinador_externo', $reserva->nombre_coordinador_externo ?? '') }}" class="w-full border border-gray-300 rounded-md p-2.5 text-sm {{ $isReadonly ? 'bg-gray-100' : '' }}" {{ $isReadonly ? 'readonly' : '' }}>
-    </div>
-
-    <!-- Celular del coordinador externo -->
-    <div>
-        <label class="block text-sm font-bold text-gray-700 mb-1">Celular del coordinador externo *</label>
-        <input type="text" name="telefono_coordinador_externo" value="{{ old('telefono_coordinador_externo', $reserva->telefono_coordinador_externo ?? '') }}" class="w-full border border-gray-300 rounded-md p-2.5 text-sm {{ $isReadonly ? 'bg-gray-100' : '' }}" {{ $isReadonly ? 'readonly' : '' }}>
-    </div>
-
     <!-- Requerimiento especial -->
     <div>
         <label class="block text-sm font-bold text-gray-700 mb-1">Requerimiento especial</label>

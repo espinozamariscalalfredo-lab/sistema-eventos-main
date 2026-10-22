@@ -13,6 +13,10 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
+    if (auth()->user()?->rol !== 'superadmin') {
+        return redirect()->route('salones.usar');
+    }
+
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -54,12 +58,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/salones/reservas', [ReservaController::class, 'obtenerReservas'])->name('api.salones.reservas');
     Route::post('/api/salones/reservas', [ReservaController::class, 'guardar'])->name('api.salones.reservas.guardar');
     Route::put('/api/salones/reservas/{id}', [ReservaController::class, 'actualizar'])->name('api.salones.reservas.actualizar');
+    Route::patch('/api/salones/reservas/{id}/cancelar', [ReservaController::class, 'cancelar'])->name('api.salones.reservas.cancelar');
     Route::delete('/api/salones/reservas/{id}', [ReservaController::class, 'eliminar'])->name('api.salones.reservas.eliminar');
 
     Route::get('/api/reservas/fechas', [SalonController::class, 'fechasConReservas'])
         ->name('api.reservas.fechas');
 
-    Route::view('/salones/asientos', 'salones.asientos')->name('salones.asientos');
+    Route::get('/salones/asientos', function () {
+        abort_unless(auth()->user()?->rol === 'superadmin', 403, 'Solo el superadministrador puede administrar los asientos.');
+
+        return view('salones.asientos');
+    })->name('salones.asientos');
 });
 
 require __DIR__.'/auth.php';

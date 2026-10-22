@@ -331,8 +331,6 @@ reservas=[
  ["requerimientos","JSON","Sí","","Lista estructurada de requerimientos."],
  ["aforo","INTEGER","Sí","","Cantidad estimada de personas."],
  ["tipo_ingreso","VARCHAR(255)","Sí","","Modalidad de ingreso."],
- ["nombre_coordinador_externo","VARCHAR(255)","Sí","","Coordinador externo."],
- ["telefono_coordinador_externo","VARCHAR(255)","Sí","","Teléfono del coordinador externo."],
  ["requerimientos_especiales","TEXT","Sí","","Detalle largo de necesidades."],
  ["registrado_por","VARCHAR(255)","Sí","","Nombre o correo que se mostró al registrar."],
  ["coordinador_interno","VARCHAR(255)","Sí","","Coordinador interno."],

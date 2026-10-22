@@ -128,7 +128,6 @@
                             <strong>Tipo de evento:</strong> <span>${data.tipo_evento || ''}</span>
                             <strong>Aforo:</strong> <span>${data.aforo || ''}</span>
                             <strong>Tipo de ingreso:</strong> <span>${data.tipo_ingreso || ''}</span>
-                            <strong>Coordinador externo:</strong> <span>${data.nombre_coordinador_externo || ''} (${data.telefono_coordinador_externo || ''})</span>
                             <strong>Requerimiento especial:</strong> <span>${data.requerimientos_especiales || ''}</span>
                             <strong>Registrado por:</strong> <span>${data.nombre_usuario || ''}</span>
                             <strong>Salón:</strong> <span>${data.salon || ''}</span>

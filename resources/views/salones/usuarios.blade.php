@@ -195,10 +195,11 @@
                 <div style="margin-bottom: 20px;">
                     <label style="font-size: 13px; color: #4b5563; font-weight: bold;">Rol</label>
                     <select name="rol" style="width: 100%; border: 1px solid #d1d5db; border-radius: 4px; padding: 8px; font-size: 13px;" required>
-                        <option value="usuario">Usuario (Solo ver)</option>
-                        <option value="superadmin">Superadmin (Crear y editar)</option>
-                        <option value="admin">Admin (Control total)</option>
+                        <option value="usuario">Usuario — Solo consulta el calendario</option>
+                        <option value="admin">Admin — Crea y cancela eventos</option>
+                        <option value="superadmin">Superadministrador — Control total</option>
                     </select>
+                    <small style="display:block; margin-top:6px; color:#64748b;">El usuario consulta; el admin crea y cancela eventos; el superadministrador puede administrar usuarios, salones y eventos.</small>
                 </div>
                 <button type="submit" style="width: 100%; background: #2563eb; color: white; border: none; padding: 10px; border-radius: 4px; font-size: 14px; font-weight: bold; cursor: pointer;">Guardar Usuario</button>
             </form>
@@ -230,10 +231,11 @@
                 <div style="margin-bottom: 20px;">
                     <label style="font-size: 13px; color: #4b5563; font-weight: bold;">Rol</label>
                     <select id="edit-rol" name="rol" style="width: 100%; border: 1px solid #d1d5db; border-radius: 4px; padding: 8px; font-size: 13px;" required>
-                        <option value="usuario">Usuario (Solo ver)</option>
-                        <option value="superadmin">Superadmin (Crear y editar)</option>
-                        <option value="admin">Admin (Control total)</option>
+                        <option value="usuario">Usuario — Solo consulta el calendario</option>
+                        <option value="admin">Admin — Crea y cancela eventos</option>
+                        <option value="superadmin">Superadministrador — Control total</option>
                     </select>
+                    <small style="display:block; margin-top:6px; color:#64748b;">El usuario consulta; el admin crea y cancela eventos; el superadministrador puede administrar usuarios, salones y eventos.</small>
                 </div>
                 <button type="submit" style="width: 100%; background: #2563eb; color: white; border: none; padding: 10px; border-radius: 4px; font-size: 14px; font-weight: bold; cursor: pointer;">Actualizar Usuario</button>
             </form>
